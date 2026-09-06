@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Public Health Data Science — 16-Week Curriculum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F7F5EF; --card:#FFFFFF; --ink:#20251F; --ink-soft:#565F58; --ink-faint:#8A9088;
+    --border:#E2DFD1; --border-strong:#CFC9B6; --teal:#2F5D50; --teal-light:#E5EFEA;
+    --ochre:#B07F22; --ochre-light:#F7EDD9; --ochre-border:#E9D7B0;
+    --done:#3B6E4F; --done-light:#E4F0E8; --err:#B33; --err-light:#FBEAEA;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased;}
+  h1,h2,h3{font-family:'Lora',serif;font-weight:600;margin:0;}
+  a{color:var(--teal);}
+  button{font-family:'Inter',sans-serif;cursor:pointer;}
+
+  .app-shell{display:flex;min-height:100vh;}
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{
+    width:270px;flex-shrink:0;background:var(--card);border-right:1px solid var(--border);
+    padding:18px 16px;position:sticky;top:0;height:100vh;overflow-y:auto;
+  }
+  .sidebar-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .sidebar-top h3{font-size:14.5px;}
+  .close-side{display:none;border:none;background:none;font-size:18px;color:var(--ink-faint);}
+  .search-box{width:100%;padding:8px 10px;border:1px solid var(--border-strong);border-radius:8px;
+    font-size:13px;margin-bottom:12px;font-family:'Inter',sans-serif;background:var(--paper);}
+  .search-box:focus{outline:2px solid var(--teal);outline-offset:1px;}
+  .side-summary{font-size:12px;color:var(--ink-soft);background:var(--paper);border:1px solid var(--border);
+    border-radius:8px;padding:8px 10px;margin-bottom:14px;}
+  .side-summary b{color:var(--teal);}
+  .sidebar h4{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);margin:14px 0 6px;}
+  .phase-nav{margin-bottom:2px;}
+  .phase-nav-name{font-size:11.5px;font-weight:600;color:var(--ink-soft);margin:10px 0 4px;}
+  .week-link{display:flex;align-items:center;gap:6px;font-size:12.8px;padding:5px 8px;border-radius:6px;
+    color:var(--ink-soft);text-decoration:none;cursor:pointer;}
+  .week-link:hover{background:var(--paper);}
+  .week-link .dot{width:6px;height:6px;border-radius:50%;background:var(--border-strong);flex-shrink:0;}
+  .week-link.complete .dot{background:var(--done);}
+  .week-link.complete{color:var(--done);}
+  .sidebar-btn{width:100%;text-align:left;background:var(--paper);border:1px solid var(--border-strong);
+    border-radius:8px;padding:8px 10px;font-size:12.5px;color:var(--ink-soft);margin-top:6px;}
+  .sidebar-btn:hover{border-color:var(--teal);color:var(--teal);}
+
+  /* ---------- Settings panel ---------- */
+  .settings-panel{display:none;background:var(--paper);border:1px solid var(--border);border-radius:8px;
+    padding:12px;margin-top:10px;font-size:12.5px;}
+  .settings-panel.open{display:block;}
+  .settings-panel label{display:block;font-size:11.5px;color:var(--ink-faint);margin:8px 0 3px;}
+  .settings-panel input{width:100%;padding:6px 8px;border:1px solid var(--border-strong);border-radius:6px;
+    font-size:12.5px;font-family:'Inter',sans-serif;}
+  .settings-note{font-size:11px;color:var(--ink-faint);margin-top:8px;line-height:1.5;}
+
+  /* ---------- Main ---------- */
+  .main{flex:1;min-width:0;}
+  .wrap{max-width:900px;margin:0 auto;padding:30px 24px 100px;}
+  .topbar{display:none;}
+  .hamburger{display:none;border:none;background:var(--card);border:1px solid var(--border-strong);
+    border-radius:8px;padding:8px 12px;font-size:13px;}
+
+  .hero p{margin:10px 0 0;color:var(--ink-soft);font-size:14.5px;max-width:660px;}
+  .hero-facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+  .hero-fact{font-size:12px;padding:5px 12px;border-radius:12px;background:var(--card);border:1px solid var(--border-strong);color:var(--ink-soft);}
+
+  .stack-shell,.pace-shell{margin:24px 0 8px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px 22px;}
+  .stack-shell h3,.pace-shell h3{font-size:16px;margin-bottom:4px;}
+  .stack-shell .sub,.pace-shell .sub{font-size:13px;color:var(--ink-soft);margin-bottom:14px;max-width:600px;}
+  table.stack-table{width:100%;border-collapse:collapse;font-size:13px;}
+  table.stack-table th{text-align:left;font-weight:600;color:var(--ink-faint);font-size:11.5px;padding:0 10px 8px 0;border-bottom:1px solid var(--border);}
+  table.stack-table td{padding:9px 10px 9px 0;border-bottom:1px dashed var(--border);vertical-align:top;}
+  table.stack-table tr:last-child td{border-bottom:none;}
+  .status-pill{display:inline-block;font-size:11px;padding:2px 9px;border-radius:10px;white-space:nowrap;}
+  .status-core{background:var(--done-light);color:var(--done);}
+  .status-new{background:var(--ochre-light);color:var(--ochre);}
+  .stack-note{margin-top:14px;font-size:13px;color:var(--ink-soft);background:var(--teal-light);border:1px solid #C7DBD1;border-radius:8px;padding:10px 14px;}
+
+  .pace-grid{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end;}
+  .pace-input label{display:block;font-size:11.5px;color:var(--ink-faint);margin-bottom:4px;}
+  .pace-input input{width:110px;padding:7px 9px;border:1px solid var(--border-strong);border-radius:6px;font-size:13px;}
+  .pace-result{font-size:13px;color:var(--ink-soft);background:var(--paper);border:1px solid var(--border);border-radius:8px;padding:10px 14px;flex:1;min-width:220px;}
+  .pace-result b{color:var(--teal);}
+
+  .progress-shell{margin:20px 0 32px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px 20px;}
+  .progress-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;flex-wrap:wrap;gap:6px;}
+  .progress-top .pct{font-family:'Lora',serif;font-size:22px;font-weight:600;color:var(--teal);}
+  .progress-top .label{font-size:12.5px;color:var(--ink-soft);}
+  .progress-track{height:8px;border-radius:5px;background:var(--border);overflow:hidden;}
+  .progress-fill{height:100%;background:var(--teal);width:0%;transition:width .3s;}
+  .week-dots{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap;}
+  .week-dot{font-size:11px;padding:4px 9px;border-radius:12px;background:var(--paper);border:1px solid var(--border-strong);color:var(--ink-soft);}
+  .week-dot.complete{background:var(--done-light);color:var(--done);border-color:var(--done);}
+
+  .phase-divider{display:flex;align-items:center;gap:12px;margin:30px 0 14px;}
+  .phase-divider .num{font-family:'Lora',serif;font-size:13px;color:var(--ink-faint);flex-shrink:0;}
+  .phase-divider .name{font-size:13.5px;color:var(--ink-soft);white-space:nowrap;}
+  .phase-divider .line{height:1px;background:var(--border-strong);flex:1;}
+  .phase-divider:first-child{margin-top:0;}
+
+  .week-block{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--teal);border-radius:8px;margin-bottom:16px;overflow:hidden;scroll-margin-top:16px;}
+  .week-block.complete{border-left-color:var(--done);}
+  .week-block.hidden{display:none;}
+  .week-block summary{list-style:none;cursor:pointer;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:14px;}
+  .week-block summary::-webkit-details-marker{display:none;}
+  .week-title h2{font-size:16.5px;}
+  .week-title .obj{font-size:13px;color:var(--ink-soft);margin-top:5px;max-width:560px;}
+  .week-right{display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+  .week-badge{font-size:11.5px;padding:3px 10px;border-radius:12px;background:var(--ochre-light);color:var(--ochre);white-space:nowrap;}
+  .week-badge.complete{background:var(--done-light);color:var(--done);}
+  .hours-chip{font-size:11px;padding:3px 9px;border-radius:12px;background:var(--paper);border:1px solid var(--border-strong);color:var(--ink-soft);white-space:nowrap;}
+  .chev{width:9px;height:9px;border-right:2px solid var(--ink-faint);border-bottom:2px solid var(--ink-faint);transform:rotate(45deg);transition:transform .2s;flex-shrink:0;}
+  details[open] .chev{transform:rotate(-135deg);}
+
+  .week-body{padding:0 20px 22px;border-top:1px solid var(--border);padding-top:16px;}
+  .tool-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+  .tool-chip{font-size:11.5px;padding:3px 10px;border-radius:12px;border:1px solid var(--border-strong);color:var(--ink-soft);background:var(--paper);}
+  .tool-chip.new{border-color:var(--teal);color:var(--teal);}
+
+  .day-list{margin-bottom:16px;}
+  .day-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px dashed var(--border);}
+  .day-item:last-child{border-bottom:none;}
+  .day-item input[type=checkbox]{margin-top:3px;width:15px;height:15px;accent-color:var(--teal);flex-shrink:0;cursor:pointer;}
+  .day-item label{font-size:13.5px;cursor:pointer;}
+  .day-item.checked label{color:var(--ink-faint);text-decoration:line-through;}
+
+  .subhead{font-size:12px;font-weight:600;color:var(--ink-soft);margin:16px 0 8px;}
+  .res-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:6px;}
+  @media(max-width:600px){.res-grid{grid-template-columns:1fr;}}
+  .res-col h4{font-size:11.5px;color:var(--ink-faint);margin:0 0 6px;font-weight:600;}
+  .res-col ul{margin:0;padding-left:16px;font-size:13px;}
+  .res-col li{margin-bottom:5px;}
+  .res-col a{text-decoration:none;border-bottom:1px solid #C7DBD1;}
+  .res-col a:hover{opacity:.7;}
+
+  .howto-shell{margin:14px 0 6px;}
+  .howto-list{margin:0;padding-left:18px;font-size:13px;}
+  .howto-list li{margin-bottom:6px;}
+  .tutorial-line{font-size:13px;margin-top:10px;color:var(--ink-soft);}
+  .tutorial-line a{font-weight:500;text-decoration:none;border-bottom:1px solid #C7DBD1;}
+
+  .deliverable-box{margin-top:14px;background:var(--teal-light);border:1px solid #C7DBD1;border-radius:8px;padding:12px 16px;font-size:13px;}
+  .deliverable-box strong{color:var(--teal);}
+  .outcomes-box{margin-top:10px;background:var(--card);border:1px solid var(--border-strong);border-radius:8px;padding:12px 16px;font-size:13px;}
+  .outcomes-box .ob-title{font-weight:600;color:var(--ink);margin-bottom:8px;}
+  .outcomes-box ul{margin:0;padding:0;list-style:none;}
+  .outcomes-box li{position:relative;padding-left:20px;margin-bottom:6px;}
+  .outcomes-box li:last-child{margin-bottom:0;}
+  .outcomes-box li::before{content:"✓";position:absolute;left:0;color:var(--teal);font-weight:600;}
+  .why-box{margin-top:10px;background:var(--ochre-light);border:1px solid var(--ochre-border);border-radius:8px;padding:12px 16px;font-size:13px;}
+  .why-box strong{color:var(--ochre);}
+
+  .week-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
+  .week-actions button{font-size:12px;padding:7px 12px;border-radius:8px;border:1px solid var(--border-strong);background:var(--paper);color:var(--ink-soft);}
+  .week-actions button:hover{border-color:var(--teal);color:var(--teal);}
+
+  /* ---------- Quiz ---------- */
+  .quiz-box{margin-top:14px;background:var(--card);border:1px solid var(--border-strong);border-radius:8px;padding:14px 16px;}
+  .quiz-box .qb-title{font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+  .quiz-q{margin-bottom:14px;}
+  .quiz-q p{font-size:13px;font-weight:600;margin:0 0 8px;}
+  .quiz-opt{display:block;font-size:13px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;margin-bottom:6px;cursor:pointer;}
+  .quiz-opt:hover{border-color:var(--border-strong);}
+  .quiz-opt.selected{border-color:var(--teal);background:var(--teal-light);}
+  .quiz-opt.correct{border-color:var(--done);background:var(--done-light);}
+  .quiz-opt.incorrect{border-color:var(--err);background:var(--err-light);}
+  .quiz-explain{font-size:12.5px;color:var(--ink-soft);margin-top:4px;padding-left:4px;display:none;}
+  .quiz-explain.show{display:block;}
+  .quiz-submit{font-size:12.5px;padding:7px 14px;border-radius:8px;border:1px solid var(--teal);background:var(--teal);color:#fff;}
+  .quiz-submit:hover{opacity:.9;}
+  .quiz-result{margin-top:10px;font-size:13px;font-weight:600;}
+  .quiz-result.pass{color:var(--done);}
+  .quiz-result.fail{color:var(--err);}
+  .quiz-retake{font-size:12px;background:none;border:none;color:var(--teal);text-decoration:underline;padding:0;margin-top:6px;}
+
+  .docs-shell{margin-top:34px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:22px;font-size:13px;color:var(--ink-soft);}
+  .docs-shell h3{font-size:16px;color:var(--ink);margin-bottom:10px;}
+  .docs-shell h4{font-size:13px;color:var(--ink);margin:14px 0 6px;}
+  .docs-shell code{background:var(--paper);padding:1px 5px;border-radius:4px;font-size:12px;}
+  .docs-shell ul{padding-left:18px;}
+  .docs-shell li{margin-bottom:5px;}
+
+  footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--border);font-size:12px;color:var(--ink-faint);}
+
+  /* ---------- Page title / overview cards / week-view nav ---------- */
+  .page-title{font-size:22px;margin:4px 0 20px;}
+
+  .week-card{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--teal);
+    border-radius:8px;margin-bottom:12px;padding:16px 20px;display:flex;justify-content:space-between;
+    align-items:center;gap:14px;cursor:pointer;transition:box-shadow .15s,border-color .15s;}
+  .week-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.06);border-left-color:var(--ochre);}
+  .week-card.complete{border-left-color:var(--done);}
+  .week-card.hidden{display:none;}
+  .chev-right{color:var(--ink-faint);font-size:20px;flex-shrink:0;}
+  .empty-note{font-size:13px;color:var(--ink-faint);padding:26px 10px;text-align:center;}
+
+  .view-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+    margin:0 0 16px;font-size:12.5px;color:var(--ink-soft);}
+  .view-nav.bottom{margin:22px 0 0;}
+  .view-nav-pos{font-weight:500;}
+  .view-nav-arrows{display:flex;gap:6px;}
+  .view-nav button{font-size:12.5px;padding:7px 12px;border-radius:8px;border:1px solid var(--border-strong);
+    background:var(--card);color:var(--ink-soft);}
+  .view-nav button:hover:not(:disabled){border-color:var(--teal);color:var(--teal);}
+  .view-nav button:disabled{opacity:.4;cursor:not-allowed;}
+
+  .week-head{padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;}
+
+  .week-link.active, .overview-link.active{background:var(--teal-light);color:var(--teal);font-weight:600;}
+
+  @media(max-width:860px){
+    .sidebar{position:fixed;left:-290px;top:0;z-index:60;box-shadow:0 0 30px rgba(0,0,0,.15);transition:left .2s;}
+    .sidebar.open{left:0;}
+    .close-side{display:block;}
+    .topbar{display:flex;align-items:center;gap:10px;padding:14px 16px;position:sticky;top:0;background:var(--paper);
+      border-bottom:1px solid var(--border);z-index:40;}
+    .hamburger{display:block;}
+    .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:55;}
+    .overlay.show{display:block;}
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <div class="overlay" id="overlay"></div>
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <h3>Curriculum map</h3>
+      <button class="close-side" id="closeSide">✕</button>
+    </div>
+
+    <button class="sidebar-btn" id="aboutToggle">About this curriculum ▾</button>
+    <div class="settings-panel open" id="aboutPanel">
+      <p style="margin:0 0 10px;">Biostatistics, epidemiology, bioinformatics, and applied AI/ML, sequenced so each week builds a real, checkable artifact — and, together, a coherent case for epidemiology-program applications. Built on your existing R, Python, and SQL foundations rather than starting from zero. Four weeks were added to the original plan to close real gaps: regression fundamentals, infectious-disease (SIR) modeling, Python for tabular health data, and machine-learning foundations — so every remaining ML and data-engineering week has the scaffolding it actually needs under it.</p>
+      <div class="hero-facts">
+        <span class="hero-fact">16 weeks · 6 phases</span>
+        <span class="hero-fact">New: SQL, plus deeper Python</span>
+        <span class="hero-fact">~108–140 hrs · ~7–9 hrs/week</span>
+        <span class="hero-fact">Every week: why, how, quiz, deliverable</span>
+      </div>
+    </div>
+
+    <input type="text" class="search-box" id="searchBox" placeholder="Search weeks, tasks, tools…">
+    <div class="side-summary" id="sideSummary">0 of 16 weeks complete</div>
+
+    <h4>Navigate</h4>
+    <a class="week-link overview-link active" id="overviewLink">◀ Overview — all weeks</a>
+    <div id="sidebarNav"></div>
+
+    <h4>Settings</h4>
+    <button class="sidebar-btn" id="settingsToggle">Name, start date &amp; pace ▾</button>
+    <div class="settings-panel" id="settingsPanel">
+      <label for="setName">Your name (for the portfolio README)</label>
+      <input type="text" id="setName" placeholder="e.g. Dimps">
+      <label for="setStart">Start date (used for calendar reminders)</label>
+      <input type="date" id="setStart">
+      <label for="setHours">Hours you can actually give per week</label>
+      <input type="number" id="setHours" min="1" max="40" placeholder="e.g. 8">
+      <div class="settings-note" id="paceNoteSmall"></div>
+      <div class="settings-note">Saved only in this browser (localStorage). No data leaves your device — there is no server here. To get an actual email reminder each week, see "How this works &amp; reminders" below.</div>
+    </div>
+
+    <h4>Explanations</h4>
+    <button class="sidebar-btn" id="docsToggle">How this works &amp; reminders ▾</button>
+    <div class="settings-panel" id="docsPanel"></div>
+  </aside>
+
+  <!-- ================= MAIN ================= -->
+  <main class="main">
+    <div class="topbar">
+      <button class="hamburger" id="openSide">☰ Menu</button>
+    </div>
+    <div class="wrap">
+
+      <h1 class="page-title">Public health data science, 16 weeks</h1>
+
+      <div id="overviewExtras">
+        <div class="stack-shell">
+          <h3>Your language &amp; tools map</h3>
+          <div class="sub">What's genuinely new here versus what's a new use for something you already know — since that changes how much of each week is "learning a tool" versus "learning a field."</div>
+          <table class="stack-table" id="stackTable"></table>
+          <div class="stack-note">Bottom line: you're not learning a new general-purpose language for this field. R and Python already cover almost everything biostatistics, epidemiology, and bioinformatics ask for — the real work is new packages, new file standards (FHIR, CDISC), new statistical vocabulary, and one genuinely new language (SQL), not new general syntax.</div>
+        </div>
+
+        <div class="pace-shell">
+          <h3>Weekly time commitment</h3>
+          <div class="sub">Each week lists a real range, not a guess — set your own weekly capacity below and this recalculates how long the full plan will actually take you, since the goal is steady progress, not burnout.</div>
+          <div class="pace-grid">
+            <div class="pace-input">
+              <label for="paceHours">Hours/week you can give</label>
+              <input type="number" id="paceHours" min="1" max="40" value="8">
+            </div>
+            <div class="pace-result" id="paceResult"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="progress-shell">
+        <div class="progress-top">
+          <span class="pct" id="pct-label">0%</span>
+          <span class="label" id="task-label">0 of 0 tasks complete</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="week-dots" id="week-dots"></div>
+      </div>
+
+      <div id="content"></div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+/* =========================================================
+   DATA
+   ========================================================= */
+const phases = [
+  { name:"Statistical foundations", weeks:3 },
+  { name:"Spatial, temporal & molecular data", weeks:3 },
+  { name:"Standards, causal reasoning & Python foundations", weeks:3 },
+  { name:"Modeling: statistics, ML & AI", weeks:3 },
+  { name:"Genomics & data engineering", weeks:2 },
+  { name:"Delivery & positioning", weeks:2 }
+];
+
+const stackRows = [
+  ["R","status-core","Deepening","Weeks 1, 2, 3, 4, 5, 8, 11, 13, 15 — your existing core language, applied to new domains (regression, spatial, outbreak, causal, genomic)."],
+  ["Bioconductor (R)","status-new","New ecosystem","Weeks 6, 13 — still R, but a genomics-specific package world you haven't touched yet."],
+  ["Python","status-core","Deepening","Weeks 9, 10, 12, 14 (optional 11) — already yours, extended into tabular health data, ML, and NLP."],
+  ["SQL / Postgres","status-new","New — but adjacent","Week 14 — the one real new language, and a light lift since Supabase already runs on Postgres."],
+  ["Advanced Excel / Power Query","status-core","Reused directly","Week 7 — building CDISC mapping specifications is exactly this kind of structured-spreadsheet work."],
+  ["Quarto / R Markdown","status-new","New tool, familiar base","Week 15 — sits directly on top of R, closer to a new workflow than a new language."],
+  ["Power BI / JS-React","status-core","Optional reuse","Weeks 15–16 — alternative delivery formats using tools you already know."]
+];
+
+const weeks = [
+{
+  id:'w1', phase:1,
+  title:'Week 1 — Descriptive biostatistics & the "Table 1"',
+  objective:'Epidemiology starts with describing a population honestly before predicting anything about it. This week rewires the "predict everything" data-science instinct into the "describe accurately first" habit every reviewer, PI, and grant committee expects from a biostatistician.',
+  hoursMin:6, hoursMax:8,
+  tools:[{name:'R', status:'core'},{name:'gtsummary', status:'new'}],
+  days:[
+    {id:'w1-mon', text:"Theory: incidence vs. prevalence. Read CDC \"Principles of Epidemiology,\" Lesson 3, then write your own definition of why a high prevalence of diabetes doesn't mean high incidence. This exact confusion is a classic red flag in epi interviews."},
+    {id:'w1-tue', text:'Tooling: learn gtsummary, the package that builds a publication-style "Table 1." Compare it against a plain summary() call to see what it adds — grouping, formatting, automatic p-values.'},
+    {id:'w1-wed', text:"Data engineering: download the Kenya Malaria Indicator Survey (HDX) and clean it with janitor::clean_names() and dplyr::case_when(), regrouping ages into 0–5, 5–18, 18+."},
+    {id:'w1-thu', text:'Lab: build a Table 1 comparing malaria cases by county, with p-values comparing regions.'},
+    {id:'w1-fri', text:'Review: hold your table next to a real Lancet/NEJM Table 1 and check formatting, ordering, and rounding against convention.'}
+  ],
+  howto:{steps:[
+    'Load the cleaned dataset with readr::read_csv().',
+    'Run janitor::clean_names() immediately, before anything else.',
+    'Recode age into bands with dplyr::case_when(), and turn malaria_status into a labeled factor.',
+    'Pipe into gtsummary::tbl_summary(by = malaria_status, include = c(...)), then chain add_p() and add_overall().',
+    'Convert to a gt object with as_gt() and export to HTML or Word using gtsummary\'s built-in save functions.'
+  ], tutorial:{name:"gtsummary's own tbl_summary() tutorial", url:'https://www.danieldsjoberg.com/gtsummary/articles/tbl_summary.html'}},
+  outcomes:['Explain why incidence and prevalence are not interchangeable.','Defend every choice in a Table 1 — why this variable, why this test, why this age grouping.','Produce a submission-ready summary table from a messy CSV in under an hour.'],
+  datasets:[{name:'Kenya Malaria Indicator Survey', url:'https://data.humdata.org/dataset/kenya-malaria-indicator-survey'},{name:'Kaggle — Malaria Dataset', url:'https://www.kaggle.com/datasets/dhavalpandya/malaria-dataset'}],
+  github:[{name:'epirhandbook_eng (source of the Epi R Handbook)', url:'https://github.com/appliedepi/epirhandbook_eng'},{name:'gtsummary package repo + examples', url:'https://github.com/ddsjoberg/gtsummary'}],
+  youtube:[{name:'"gtsummary in 10 minutes" — search this on YouTube', url:'https://www.youtube.com/results?search_query=gtsummary+tutorial+r'},{name:'StatQuest — "Odds Ratios, Clearly Explained"', url:'https://www.youtube.com/results?search_query=statquest+odds+ratios'}],
+  reading:['The Epidemiologist R Handbook — Ch. 8 (Cleaning data) and Ch. 17 (Descriptive tables), free at epirhandbook.com','CDC "Principles of Epidemiology in Public Health Practice," self-paced course (free, CDC TRAIN)','OpenIntro Statistics — Ch. 1 (Data collection), free PDF at openintro.org'],
+  deliverable:'01_demographics_table.R producing an HTML table of patient demographics stratified by malaria-positive vs. negative status.',
+  why:'This is the artifact almost every biostatistics job and grad application asks to see first: can you describe a population correctly?',
+  quiz:[
+    {q:'A disease has high prevalence but low incidence. What does that most likely mean?', options:['The disease is newly emerging','People live with it for a long time once diagnosed','The data is wrong','It only affects a small area'], correct:1, explain:'Prevalence is a stock (how many have it now); incidence is a flow (how many new cases appear). Long survival with a condition inflates prevalence without needing high incidence.'},
+    {q:'What does gtsummary\'s add_p() add to a Table 1?', options:['Row percentages only','A p-value comparing groups for each variable','A plot','Nothing, it is decorative'], correct:1, explain:'add_p() runs an appropriate statistical test per row and appends the p-value column automatically.'},
+    {q:'Why clean column names with janitor::clean_names() before anything else?', options:['It looks nicer','Downstream code that references column names will break on inconsistent names','It compresses the file','It is required by gtsummary'], correct:1, explain:'Messy or inconsistent names break every downstream reference, so fixing them first prevents a cascade of errors.'}
+  ]
+},
+{
+  id:'w2', phase:1,
+  title:'Week 2 — Probability, inference & study design',
+  objective:'Before touching a regression model, biostatistics programs expect fluency in what a p-value actually means, how much sample size a study needs, and which study design answers which question.',
+  hoursMin:6, hoursMax:8,
+  tools:[{name:'R', status:'core'},{name:'pwr package', status:'new'}],
+  days:[
+    {id:'w2-mon', text:'Theory: study designs. Compare cohort, case-control, cross-sectional, and RCT designs across 3 real Kenyan public health papers and identify which design each used and why.'},
+    {id:'w2-tue', text:'Tooling: confidence intervals and hypothesis testing in R (t-test, chi-square), and what a 95% CI actually promises.'},
+    {id:'w2-wed', text:'Data engineering: use the pwr package to calculate the sample size your Week 1 malaria table would have needed to detect a 10% prevalence difference between two counties.'},
+    {id:'w2-thu', text:'Lab: Bayesian vs. frequentist. Fit the same simple proportion estimate both ways (a basic beta-binomial in R) and contrast how each answers "what do we believe now."'},
+    {id:'w2-fri', text:'Review: write a half-page "stats refresher" cheat sheet in your own words covering CI, p-value, power, and study design types.'}
+  ],
+  howto:{steps:[
+    'Pick one finding from your Week 1 table — e.g. the malaria prevalence difference between two counties.',
+    'Decide the effect size you want to detect; a 10-percentage-point difference is a reasonable first pass.',
+    "Convert that into Cohen's effect size h with pwr::ES.h(p1, p2).",
+    'Run pwr::pwr.2p.test(h = ..., sig.level = 0.05, power = 0.80) and read off the required n per group.',
+    'Separately, fit a t.test() or prop.test() on real data and write one plain sentence on exactly what the resulting CI does and does not tell you.'
+  ], tutorial:{name:"Datanovia's pwr package walkthrough", url:'https://www.datanovia.com/learn/biostatistics/power-analysis-in-r'}},
+  outcomes:['State correctly what a 95% confidence interval promises — and what it does not.','Calculate the sample size a two-group comparison needs, given effect size and power.','Name which study design fits a given research question, and why the others would not.'],
+  datasets:[{name:'Reuse the Week 1 malaria dataset for the power calculation', url:'https://data.humdata.org/dataset/kenya-malaria-indicator-survey'},{name:'World Bank Health Nutrition & Population Statistics', url:'https://databank.worldbank.org/source/health-nutrition-and-population-statistics'}],
+  github:[{name:'pwr package repo', url:'https://github.com/heemod/pwr'},{name:'Statistical Rethinking companion code', url:'https://github.com/rmcelreath/rethinking'}],
+  youtube:[{name:'StatQuest — "P-values, Clearly Explained"', url:'https://www.youtube.com/results?search_query=statquest+p+values+clearly+explained'},{name:'StatQuest — "Confidence Intervals"', url:'https://www.youtube.com/results?search_query=statquest+confidence+intervals'}],
+  reading:['OpenIntro Statistics — chapters on inference and study design, free PDF at openintro.org','Statistical Rethinking, Richard McElreath — Ch. 1–2'],
+  deliverable:'02_inference_refresher.R plus a one-page personal statistics cheat sheet (PDF).',
+  why:'Statistics, not code, is the actual gatekeeping skill in biostatistics admissions and interviews.',
+  quiz:[
+    {q:'A 95% confidence interval means:', options:['95% chance the true value is inside this specific interval','If you repeated the study many times, about 95% of such intervals would contain the true value','95% of the data falls in this range','The result is 95% likely to be true'], correct:1, explain:'The 95% refers to the long-run behavior of the method across repeated studies, not the probability for this one interval.'},
+    {q:'Increasing your required statistical power (e.g. from 80% to 90%) generally does what to required sample size?', options:['Decreases it','Increases it','No effect','Makes it random'], correct:1, explain:'Higher power means a lower chance of missing a real effect, which requires more data to achieve.'},
+    {q:'Which design directly randomizes exposure to establish causality?', options:['Cross-sectional study','Case-control study','Randomized controlled trial','Cohort study'], correct:2, explain:'Only an RCT randomly assigns exposure, which is what allows a strong causal claim.'}
+  ]
+},
+{
+  id:'w3', phase:1,
+  title:'Week 3 — Regression foundations (linear, logistic & Poisson)',
+  objective:'Move from describing data (Week 1) and testing hypotheses (Week 2) to modeling relationships. Linear and logistic regression are the backbone of almost every epidemiological analysis that follows, and Poisson/rate regression is how epidemiologists model disease incidence and event counts. This week did not exist in the original plan — it was the biggest gap: later weeks assumed regression fluency without ever teaching it.',
+  hoursMin:6, hoursMax:8,
+  tools:[{name:'R', status:'core'},{name:'broom', status:'new'}],
+  days:[
+    {id:'w3-mon', text:'Theory: simple linear regression assumptions — linearity, independence, homoscedasticity, normality of residuals — and what happens when each is violated.'},
+    {id:'w3-tue', text:'Tooling: fit lm() and glm() in R, and use broom::tidy() to get clean coefficient tables instead of raw summary() output.'},
+    {id:'w3-wed', text:'Data engineering: prepare the Week 1 malaria dataset for regression — check multicollinearity with car::vif(), and relevel categorical predictors to a clinically meaningful reference.'},
+    {id:'w3-thu', text:'Lab: fit a logistic regression predicting malaria positivity from age, net use, and county, then a Poisson regression modeling case counts as a function of population and rainfall.'},
+    {id:'w3-fri', text:'Review: run model diagnostics (residual plots, Cook\'s distance) and write two sentences on which assumptions your model violates and whether it is still useful anyway.'}
+  ],
+  howto:{steps:[
+    'Load the cleaned Week 1 dataset and convert categorical predictors to factors, releveling with relevel() to a clinically meaningful reference (e.g. "no net use" as baseline).',
+    'Fit the logistic model: glm(malaria_status ~ age + net_use + county, data = ..., family = binomial).',
+    'Extract clean output with broom::tidy(model, exponentiate = TRUE, conf.int = TRUE) to get odds ratios and CIs directly.',
+    'Fit the Poisson rate model for counts: glm(case_count ~ offset(log(population)) + rainfall, family = poisson) — the offset term is what turns this into a rate model rather than a raw count model.',
+    'Check diagnostics with plot(model) for residuals and car::vif(model) for multicollinearity.'
+  ], tutorial:{name:'UCLA IDRE — Logistic Regression in R (walkthrough series)', url:'https://stats.oarc.ucla.edu/r/dae/logit-regression/'}},
+  outcomes:['Interpret an odds ratio and an incidence rate ratio correctly.','Diagnose when linear regression assumptions are violated.','Explain when to use logistic vs. Poisson vs. linear regression.'],
+  datasets:[{name:'Reuse the Week 1 Kenya Malaria dataset', url:'https://data.humdata.org/dataset/kenya-malaria-indicator-survey'}],
+  github:[{name:'broom package repo', url:'https://github.com/tidymodels/broom'},{name:'easystats/performance (model diagnostics)', url:'https://github.com/easystats/performance'}],
+  youtube:[{name:'StatQuest — "Logistic Regression, Clearly Explained"', url:'https://www.youtube.com/results?search_query=statquest+logistic+regression'},{name:'StatQuest — "Poisson Regression, Clearly Explained"', url:'https://www.youtube.com/results?search_query=statquest+poisson+regression'}],
+  reading:['An Introduction to Statistical Learning (ISLR) — Ch. 3 (Linear Regression) and Ch. 4 (Classification), free at statlearning.com','Regression Methods in Biostatistics, Vittinghoff et al. — introductory chapters'],
+  deliverable:'03_regression_models.R with tidy logistic and Poisson model outputs and a written diagnostics note.',
+  why:'Regression is the single most reused statistical tool across every remaining week in this curriculum, from causal inference to survival analysis — getting comfortable with glm() now pays off everywhere downstream.',
+  quiz:[
+    {q:'An odds ratio of 0.5 for "bed net use" means:', options:['Net users have half the odds of infection compared to non-users','Nets cause half of all infections','The result is not significant','Net users are 50% of the sample'], correct:0, explain:'An OR below 1 means the exposed group has lower odds of the outcome than the reference group, here about half.'},
+    {q:'Why does the Poisson model include offset(log(population))?', options:['To make the model run faster','To convert the model from predicting raw counts to predicting a rate','It is required syntax with no meaning','To remove missing data'], correct:1, explain:'The offset anchors the count to its exposure (population), turning the model into a rate model rather than a raw-count model.'},
+    {q:'A high VIF (variance inflation factor) for a predictor signals:', options:['The predictor is unimportant','Multicollinearity with other predictors','The outcome is binary','The sample size is too small'], correct:1, explain:'VIF quantifies how much a predictor\'s variance is inflated due to correlation with other predictors in the model.'}
+  ]
+},
+{
+  id:'w4', phase:2,
+  title:'Week 4 — Spatial epidemiology (GIS)',
+  objective:'Health outcomes cluster in space — outbreak response, resource allocation, and health-access equity all live on a map. GIS is also one of the more differentiating skills on a biostatistics CV.',
+  hoursMin:7, hoursMax:9,
+  tools:[{name:'R', status:'core'},{name:'sf / tmap', status:'new'}],
+  days:[
+    {id:'w4-mon', text:'Theory: coordinate reference systems. Understand why raw GPS data (WGS84) can misalign with Kenyan government maps until correctly reprojected.'},
+    {id:'w4-tue', text:'Tooling: learn the sf package for reading .shp shapefiles and .geojson into R as spatial objects.'},
+    {id:'w4-wed', text:'Data engineering: download Kenya Health Facilities (HDX) and Kenya county boundaries, then run st_join() to assign every facility to its correct county automatically.'},
+    {id:'w4-thu', text:'Lab: build a choropleth map coloring counties by health facilities per 10,000 people, using tmap or ggplot2 + geom_sf.'},
+    {id:'w4-fri', text:'Review: a cartography check — north arrow, scale bar, and a colorblind-safe palette (viridis).'}
+  ],
+  howto:{steps:[
+    'Read the facility list and county boundaries with sf::st_read() (shapefiles) or a geojson reader.',
+    'Check both layers share a coordinate reference system with sf::st_crs(); reproject with st_transform() if not.',
+    'Run sf::st_join(facilities, counties, join = st_within) to tag every facility with its county.',
+    'Join in population figures and compute facilities-per-10,000-people with dplyr::mutate().',
+    'Build the map: tm_shape(counties) + tm_polygons("rate", palette = "viridis") + tm_compass() + tm_scale_bar().'
+  ], tutorial:{name:"tmap's official vignettes — vignette(\"tmap-getstarted\")", url:'https://r-tmap.github.io/tmap/'}},
+  outcomes:['Explain why a CRS mismatch silently breaks a spatial join, and how to catch it.','Build a choropleth map from two independent data sources without hand-matching them.','Critique a map for whether its color scale would mislead a colorblind reader.'],
+  datasets:[{name:'Kenya Master Health Facility List (HDX)', url:'https://data.humdata.org/dataset/kenya-master-health-facility-list'},{name:'GADM Kenya administrative boundaries', url:'https://gadm.org/download_country.html'}],
+  github:[{name:'r-spatial/sf — official examples', url:'https://github.com/r-spatial/sf'},{name:'Geocomputation with R (full book + code)', url:'https://github.com/geocompx/geocompr'}],
+  youtube:[{name:'"Spatial data analysis in R with sf" — search on YouTube', url:'https://www.youtube.com/results?search_query=sf+package+r+tutorial'},{name:'"Choropleth maps in R with tmap" — search on YouTube', url:'https://www.youtube.com/results?search_query=tmap+choropleth+r+tutorial'}],
+  reading:['The Epidemiologist R Handbook — Ch. 28 (GIS basics)','Geocomputation with R — Ch. 2, free at r.geocompx.org'],
+  deliverable:'kenya_health_access_map.png plus a written list of the 5 counties with lowest facility access per capita.',
+  why:'Facility-access mapping is exactly the kind of applied, locally grounded analysis that distinguishes a public-health application essay.',
+  quiz:[
+    {q:'Two spatial layers refuse to line up on a map. The most likely cause is:', options:['One layer has more rows','A coordinate reference system mismatch','The file is corrupted','tmap is broken'], correct:1, explain:'CRS mismatches are the classic silent cause of misaligned spatial layers; always check st_crs() before joining.'},
+    {q:'st_join(facilities, counties, join = st_within) does what?', options:['Merges two unrelated datasets by column name','Assigns each facility point to the county polygon that contains it','Deletes facilities outside Kenya','Creates a new shapefile from scratch'], correct:1, explain:'st_within checks spatial containment, tagging each point with the polygon it physically falls inside.'},
+    {q:'Why prefer the viridis palette for a choropleth map?', options:['It is the default in Excel','It is perceptually uniform and colorblind-safe','It only has two colors','It is required by CDISC'], correct:1, explain:'Viridis is designed to be readable by colorblind viewers and to represent value differences perceptually evenly.'}
+  ]
+},
+{
+  id:'w5', phase:2,
+  title:'Week 5 — Infectious disease modeling (SIR / compartmental models)',
+  objective:"You already have R experience building SIR models — this week formalizes and extends that into a full compartmental-modeling skillset: fitting models to real outbreak data and estimating R0, the core toolkit behind outbreak-response and pandemic-preparedness roles. Added because it builds directly on a skill you already have, rather than introducing something from zero.",
+  hoursMin:7, hoursMax:9,
+  tools:[{name:'R', status:'core'},{name:'deSolve', status:'new'}],
+  days:[
+    {id:'w5-mon', text:'Theory: the S, I, R compartments, the assumptions each transition encodes, and what R0 actually represents — the average secondary infections from one case in a fully susceptible population.'},
+    {id:'w5-tue', text:'Tooling: the deSolve package, solving ODEs with ode(), plotting the classic SIR curve for a hypothetical outbreak.'},
+    {id:'w5-wed', text:'Data engineering: pull a real outbreak time series (a past Kenyan cholera or measles outbreak from WHO/HDX) and format it as daily or weekly case counts.'},
+    {id:'w5-thu', text:'Lab: fit your SIR model to the real case data by adjusting beta and gamma until the model curve matches, then formally estimate R0 from the early exponential growth phase.'},
+    {id:'w5-fri', text:'Review: extend to an SEIR model (adding an Exposed compartment) and write a paragraph on when the extra compartment actually changes your conclusions versus when it is unnecessary complexity.'}
+  ],
+  howto:{steps:[
+    'Define the ODE system as an R function: dS, dI, dR based on beta and gamma parameters.',
+    'Solve with deSolve::ode(y = initial_state, times = days, func = sir_model, parms = params).',
+    'Plot S, I, R curves over time with matplot() or convert to long format and use ggplot2.',
+    'To fit real data, write a sum-of-squared-errors function comparing your model\'s I(t) to observed cases, then optimize with optim() over beta and gamma.',
+    'Estimate R0 with the relation R0 = beta/gamma from your fitted parameters, and cross-check against the early exponential-growth-rate method.'
+  ], tutorial:{name:'Fitting mechanistic models to data in R (King, Ionides & Pascual)', url:'https://kingaa.github.io/clim-dis/parest/parest.html'}},
+  outcomes:['Build and solve a basic SIR model from scratch.','Fit model parameters to real case data.','Explain what R0 does and does not tell you about an outbreak.'],
+  datasets:[{name:'WHO/HDX outbreak time-series data (measles, cholera, or Ebola)', url:'https://data.humdata.org/'},{name:'Project Tycho — historical infectious disease surveillance data', url:'https://www.tycho.pitt.edu/'}],
+  github:[{name:'epirecipes — compendium of fitted epidemic models', url:'https://github.com/epirecipes/sir-epidemic-model'},{name:'deSolve package repo', url:'https://github.com/cran/deSolve'}],
+  youtube:[{name:'"SIR model in R with deSolve" — search on YouTube', url:'https://www.youtube.com/results?search_query=sir+model+r+deSolve+tutorial'},{name:'"Basic reproduction number R0 explained" — search on YouTube', url:'https://www.youtube.com/results?search_query=r0+basic+reproduction+number+explained'}],
+  reading:['Modeling Infectious Diseases in Humans and Animals, Keeling & Rohani — Ch. 1–2','epirecipes.github.io — open compendium of epidemic model code in R and Python'],
+  deliverable:'05_sir_model.R fitting a compartmental model to a real outbreak dataset, with an estimated R0 and a short interpretation.',
+  why:'Outbreak modeling is a distinctive, high-demand skill for Africa CDC, WHO, and academic epidemiology roles — this week turns a skill you already have into a data-fitted, portfolio-ready deliverable rather than a classroom exercise.',
+  quiz:[
+    {q:'R0 = 2 for a disease means:', options:['2% of the population will get infected','On average, one case generates 2 new cases in a fully susceptible population','The outbreak will last 2 weeks','2 people started the outbreak'], correct:1, explain:'R0 is the average number of secondary infections one case produces when everyone around it is susceptible.'},
+    {q:'In the SIR model, gamma represents:', options:['The transmission rate','The recovery rate (how quickly infected people leave the I compartment)','The birth rate','The vaccination rate'], correct:1, explain:'Gamma is the rate at which infected individuals recover (or are removed), typically 1/(infectious period).'},
+    {q:'Adding an "Exposed" compartment (making it SEIR) is most useful when:', options:['The disease has no incubation period','There is a meaningful incubation period before someone becomes infectious','The population is fully immune','You want a simpler model'], correct:1, explain:'SEIR is worth the extra complexity specifically when a lag between exposure and infectiousness matters to the dynamics.'}
+  ]
+},
+{
+  id:'w6', phase:2,
+  title:'Week 6 — Bioinformatics foundations',
+  objective:'Biotech and modern epidemiology increasingly run on molecular data — pathogen genomic surveillance, outbreak lineage tracking, and pharma R&D all assume you can at least read a gene-expression matrix.',
+  hoursMin:7, hoursMax:9,
+  tools:[{name:'R', status:'core'},{name:'Bioconductor', status:'new'}],
+  days:[
+    {id:'w6-mon', text:'Theory: the central dogma refresher (DNA → RNA → protein) and what "gene expression" actually measures.'},
+    {id:'w6-tue', text:'Tooling: install Bioconductor in R and explore its package ecosystem — the bioinformatics equivalent of CRAN.'},
+    {id:'w6-wed', text:'Data engineering: download one small dataset from NCBI GEO (a cancer or infectious-disease expression study, under 50 samples) and load it as a SummarizedExperiment object.'},
+    {id:'w6-thu', text:'Lab: run basic quality control and normalization on the expression matrix, checking for batch effects with a PCA plot.'},
+    {id:'w6-fri', text:'Review: write a plain-English paragraph explaining what a gene expression matrix is to someone with no biology background.'}
+  ],
+  howto:{steps:[
+    'Install Bioconductor\'s BiocManager, then BiocManager::install(c("SummarizedExperiment","GEOquery")).',
+    'Pull your chosen study with GEOquery::getGEO("GSExxxxx"), which returns the data already wrapped as an ExpressionSet or SummarizedExperiment.',
+    'Inspect the object with assay(), colData(), and rowData() before doing anything else.',
+    'Normalize or log-transform if the platform requires it, then run prcomp() on the transposed expression matrix for PCA.',
+    'Plot the first two principal components with ggplot2, colored by sample group, and look for unexpected clustering — a sign of batch effects.'
+  ], tutorial:{name:"Bioconductor's SummarizedExperiment vignette", url:'https://bioconductor.org/packages/release/bioc/vignettes/SummarizedExperiment/inst/doc/SummarizedExperiment.html'}},
+  outcomes:['Explain what a gene expression matrix measures, in one plain-English sentence.','Load, inspect, and normalize a public GEO dataset without following a walkthrough script.','Read a PCA plot well enough to say whether a batch effect is present.'],
+  datasets:[{name:'NCBI GEO — Gene Expression Omnibus', url:'https://www.ncbi.nlm.nih.gov/geo/'},{name:'Kaggle — Gene expression cancer RNA-Seq', url:'https://www.kaggle.com/datasets/brunogrisci/gene-expression-cancer-rnaseq'}],
+  github:[{name:'Bioconductor workflow repos', url:'https://github.com/Bioconductor/bioc-workflows'},{name:'awesome-bioinformatics (curated resource list)', url:'https://github.com/danielecook/Awesome-Bioinformatics'}],
+  youtube:[{name:'StatQuest — "RNA-seq" playlist', url:'https://www.youtube.com/results?search_query=statquest+rna+seq'},{name:'"Introduction to Bioconductor" — search on YouTube', url:'https://www.youtube.com/results?search_query=introduction+to+bioconductor'}],
+  reading:['Bioinformatics Data Skills, Vince Buffalo — Ch. 1–3','Bioconductor.org — "Get Started" tutorial'],
+  deliverable:'06_geo_qc.R producing a PCA plot of your chosen GEO dataset with a short write-up of what it shows.',
+  why:'This week opens the door to biotech-side roles specifically — vaccine research, diagnostics, and pharma R&D all assume this exact vocabulary as table stakes.',
+  quiz:[
+    {q:'A gene expression matrix most directly measures:', options:['DNA sequence variants','How active (transcribed) each gene is across samples','Blood pressure readings','Patient demographics'], correct:1, explain:'Expression values reflect how much each gene is being transcribed in a given sample, not the underlying DNA sequence itself.'},
+    {q:'On a PCA plot of expression data, samples clustering by processing batch rather than by biological group suggests:', options:['A perfect result','A batch effect that needs correcting','The wrong gene was measured','Nothing — this is expected'], correct:1, explain:'If technical batch, not biology, explains the main clustering, that is a batch effect and needs correction before further analysis.'},
+    {q:'GEOquery::getGEO() returns data already wrapped in what kind of R object?', options:['A plain data.frame only','A SummarizedExperiment/ExpressionSet object', 'An image file','An SQL connection'], correct:1, explain:'GEOquery wraps the expression data, sample metadata, and feature metadata together in a structured Bioconductor object.'}
+  ]
+},
+{
+  id:'w7', phase:3,
+  title:'Week 7 — Industry standards (CDISC/SDTM)',
+  objective:'Every pharma company, CRO, and many global-health orgs (KEMRI, Roche, CDC-funded studies) require CDISC/SDTM-compliant data. This is unglamorous, but it is a specific, checkable line on a CV that signals you can work inside a regulated clinical-trials pipeline.',
+  hoursMin:6, hoursMax:8,
+  tools:[{name:'Excel / Power Query', status:'core'},{name:'R', status:'core'}],
+  days:[
+    {id:'w7-mon', text:'Theory: the core SDTM domains — DM (demographics), AE (adverse events), LB (lab results) — the three domains almost every clinical dataset touches.'},
+    {id:'w7-tue', text:'Tooling: create a mapping specification in Excel, mapping a raw column like dob to the SDTM column BRTHDTC in ISO 8601 format.'},
+    {id:'w7-wed', text:'Data engineering: write a script that renames and reformats your Week 1 dataset to match the DM domain, with all variable names uppercase.'},
+    {id:'w7-thu', text:'Lab: create a Define file listing every variable, its label, and its type (Char/Num).'},
+    {id:'w7-fri', text:'Review: compare your dataset against the official CDISC SDTM Implementation Guide, line by line.'}
+  ],
+  howto:{steps:[
+    'List every raw variable in your Week 1 dataset alongside its data type.',
+    'For each one, find its home in an SDTM domain (mostly DM here) using the SDTMIG as a reference — dob → BRTHDTC, sex → SEX, and so on.',
+    'Build the mapping spec as a spreadsheet: raw column | SDTM variable | transformation rule | notes.',
+    'Write the R script that applies exactly those rules — rename, reformat dates to ISO 8601, uppercase variable names.',
+    'Produce the Define file by hand: a plain data dictionary of variable, label, and type.'
+  ], tutorial:{name:"Certara's step-by-step guide to the SDTM mapping process", url:'https://www.certara.com/blog/the-sdtm-mapping-process-simplified/'}},
+  outcomes:['Locate the correct SDTM domain and variable name for a given raw clinical field.','Explain, to a non-technical person, why regulators require a common data standard at all.','Produce a mapping specification a stranger could follow without asking a single question.'],
+  datasets:[{name:'Your Week 1 Kenya Malaria dataset, reused', url:'https://data.humdata.org/dataset/kenya-malaria-indicator-survey'}],
+  github:[{name:'PHUSE — public SDTM/CDISC example scripts', url:'https://github.com/phuse-org'},{name:'pharmaverse — open-source R packages for clinical data standards', url:'https://github.com/pharmaverse'}],
+  youtube:[{name:'"CDISC SDTM explained" — search on YouTube', url:'https://www.youtube.com/results?search_query=cdisc+sdtm+explained'}],
+  reading:['CDISC.org — SDTM Implementation Guide (free registration)','CDISC.org — free e-learning modules on SDTM basics'],
+  deliverable:'/SDTM_Submission folder containing DM.csv and define.xml.',
+  why:'This week converts a tool you already use daily — spreadsheets — into a compliance skill most data scientists never build.',
+  quiz:[
+    {q:'Which SDTM domain covers patient demographics?', options:['AE','LB','DM','EX'], correct:2, explain:'DM is the Demographics domain — one of the first domains built in nearly every clinical dataset.'},
+    {q:'Why do regulators require a common data standard like SDTM at all?', options:['To make files bigger','So datasets from different sponsors and studies can be reviewed and compared consistently','To slow down submissions','It has no real purpose'], correct:1, explain:'A shared standard lets reviewers apply the same tools and checks across submissions from different companies and trials.'},
+    {q:'A Define file is best described as:', options:['A backup copy of the raw data','A data dictionary describing every variable, its label, and type','A statistical analysis plan','A patient consent form'], correct:1, explain:'The Define file documents exactly what is in the dataset so it is auditable by someone who never worked on it.'}
+  ]
+},
+{
+  id:'w8', phase:3,
+  title:'Week 8 — Causal inference & DAGs',
+  objective:'This is the conceptual core that separates a biostatistician from a data scientist who only knows prediction: can you argue about why something works, identify confounding, and explain an adjusted effect to a non-technical audience?',
+  hoursMin:7, hoursMax:9,
+  tools:[{name:'R', status:'core'},{name:'dagitty / ggdag', status:'new'}],
+  days:[
+    {id:'w8-mon', text:'Theory: the counterfactual — what it means to ask "what would have happened to this patient if they hadn\'t taken the medicine?"'},
+    {id:'w8-tue', text:'Tooling: learn ggdag or dagitty and draw a DAG for malaria infection with nodes for mosquito nets, swamp proximity, age, and wealth.'},
+    {id:'w8-wed', text:'Analysis: identify a backdoor path in your DAG and explain, in plain language, what confounding it represents.'},
+    {id:'w8-thu', text:'Lab: fit glm(malaria_status ~ net_usage + confounders, family = binomial) and interpret the odds ratio in plain language.'},
+    {id:'w8-fri', text:'Review: write a 1-page plain-English summary for a non-technical Minister of Health explaining the adjusted vs. unadjusted effect of mosquito nets.'}
+  ],
+  howto:{steps:[
+    'List every variable you believe influences both mosquito-net use and malaria infection.',
+    "Draw the DAG in dagitty.net first — it's faster to sketch and test there than straight in R.",
+    "Use the tool's built-in adjustment-set finder to see which variables you must control for.",
+    'Rebuild the same DAG in R with ggdag::dagify() and ggdag_adjustment_set() so it is reproducible.',
+    'Fit glm(malaria_status ~ net_usage + <adjustment set>, family = binomial) and exponentiate the coefficient (exp(coef)) to get the odds ratio.'
+  ], tutorial:{name:"Andrew Heiss's DAG walkthrough (mosquito-net-and-malaria example)", url:'https://evalf22.classes.andrewheiss.com/example/dags.html'}},
+  outcomes:['Identify a backdoor path in a DAG and explain what confounding it represents.','Justify, out loud, why you adjusted for some variables and not others.','Translate an odds ratio into a sentence a non-technical minister would understand.'],
+  datasets:[{name:'Reuse your Week 1 malaria dataset for the regression', url:'https://data.humdata.org/dataset/kenya-malaria-indicator-survey'},{name:'Kaggle — Framingham Heart Study', url:'https://www.kaggle.com/datasets/aasheesh200/framingham-heart-study-dataset'}],
+  github:[{name:'r-causal/ggdag', url:'https://github.com/r-causal/ggdag'},{name:'Causal Inference: What If — companion code repo', url:'https://github.com/migariane/Whatifbook'}],
+  youtube:[{name:'"Causal inference bootcamp" — search on YouTube', url:'https://www.youtube.com/results?search_query=causal+inference+bootcamp'}],
+  reading:['Causal Inference: What If, Hernán & Robins — Ch. 1–3, free PDF from Harvard T.H. Chan (miguelhernan.org)'],
+  deliverable:'causal_web.png (your DAG) plus a 1-page report on adjusted vs. unadjusted mosquito-net effects.',
+  why:'Being able to reason about confounding out loud, not just fit a model, is the single most-tested skill in a biostatistics program interview.',
+  quiz:[
+    {q:'A "backdoor path" in a DAG represents:', options:['A coding bug','A non-causal path creating spurious association between exposure and outcome','The main causal effect itself','A missing data problem'], correct:1, explain:'Backdoor paths are alternative routes connecting exposure and outcome through a common cause, which must be blocked (adjusted for) to isolate the true causal effect.'},
+    {q:'Why might you deliberately NOT adjust for a variable that sits on the causal pathway between exposure and outcome?', options:['To save time','Adjusting for a mediator can block part of the very effect you are trying to measure','It is always required','Mediators cannot be measured'], correct:1, explain:'Controlling for a mediator removes some of the effect that flows through it, biasing the estimate of the total causal effect.'},
+    {q:'An odds ratio of 0.4 for net use, after adjustment, is best explained to a non-technical audience as:', options:['Nets reduce malaria risk by exactly 60% in all cases','After accounting for other factors, net users had substantially lower odds of malaria than non-users','Nets caused 40% of infections','The result is not interpretable'], correct:1, explain:'A plain-language translation keeps the direction and rough magnitude without overstating precision or causal certainty beyond what the design supports.'}
+  ]
+},
+{
+  id:'w9', phase:3,
+  title:'Week 9 — Python for health data science (pandas & numpy)',
+  objective:"Later weeks (NLP, ML, health-data engineering) assume comfortable pandas and numpy skills. You already use Python for scraping and optimization; this week fills the specific gap of tabular health-data wrangling, which is a different muscle from scripting or numerical optimization. Added because the original plan jumped into heavy Python weeks without ever building this foundation first.",
+  hoursMin:5, hoursMax:7,
+  tools:[{name:'Python', status:'core'},{name:'pandas / numpy', status:'new'}],
+  days:[
+    {id:'w9-mon', text:'Theory: tidy-data principles (one row per observation, one column per variable) and why messy health datasets (wide-format labs, repeated measures) need reshaping before analysis.'},
+    {id:'w9-tue', text:'Tooling: pandas fundamentals for health data — groupby, merge, pivot_table, and handling missing data (isna, fillna, dropna) with a clinical lens: is this missing-not-at-random?'},
+    {id:'w9-wed', text:'Data engineering: take a messy CSV (reuse Week 1\'s or find a new WHO/Kaggle health dataset) and clean it end-to-end in pandas — fix dtypes, handle missing values, reshape wide to long with melt().'},
+    {id:'w9-thu', text:'Lab: reproduce your Week 1 R Table 1 in Python using pandas plus a summary-table library, and compare the two workflows side by side.'},
+    {id:'w9-fri', text:'Review: write a short comparison note on where you\'d reach for R vs. Python for a given health-data task, and why — a genuinely common interview question.'}
+  ],
+  howto:{steps:[
+    'Load the CSV with pandas.read_csv(), inspect dtypes with .info() and missingness with .isna().sum().',
+    'Fix data types explicitly — dates with pd.to_datetime, categories with .astype("category").',
+    'Reshape as needed with .melt() or .pivot_table() depending on the target shape.',
+    'Group and summarize with .groupby(...).agg(...) for the stratified statistics your Table 1 needs.',
+    "Build the summary table with a library like tableone (pip install tableone), which mirrors gtsummary's output in Python."
+  ], tutorial:{name:'pandas official "10 minutes to pandas" + tableone package docs', url:'https://pandas.pydata.org/docs/user_guide/10min.html'}},
+  outcomes:['Clean and reshape a messy health dataset in pandas without following a script.','Explain groupby, merge, and pivot well enough to teach them to someone else.','Justify a tool choice (R vs. Python) for a specific health-data task.'],
+  datasets:[{name:'Reuse the Week 1 malaria dataset, or a new WHO/Kaggle dataset', url:'https://data.humdata.org/dataset/kenya-malaria-indicator-survey'}],
+  github:[{name:'pandas-dev/pandas', url:'https://github.com/pandas-dev/pandas'},{name:'tompollard/tableone', url:'https://github.com/tompollard/tableone'}],
+  youtube:[{name:'"pandas groupby and merge tutorial" — search on YouTube', url:'https://www.youtube.com/results?search_query=pandas+groupby+merge+tutorial'},{name:'"pandas data cleaning tutorial" — search on YouTube', url:'https://www.youtube.com/results?search_query=pandas+data+cleaning+tutorial'}],
+  reading:['Python for Data Analysis, Wes McKinney — Ch. 3, 7, 8','pandas official user guide — "Working with missing data"'],
+  deliverable:'09_pandas_table1.ipynb reproducing a Table 1 in Python plus the R-vs-Python comparison note.',
+  why:"Nearly every remaining Python week assumes this fluency already exists. Building it now, on data you already understand from Week 1, means the syntax is the only new thing you're learning — not syntax and domain at the same time.",
+  quiz:[
+    {q:'Tidy data means:', options:['No missing values anywhere','One row per observation, one column per variable','Data sorted alphabetically','Data stored as a single string'], correct:1, explain:'Tidy data is a structural convention, not a cleanliness one — one observation per row, one variable per column.'},
+    {q:'.melt() in pandas is used to:', options:['Delete rows','Reshape data from wide format to long format','Merge two datasets','Convert text to numbers'], correct:1, explain:'melt() unpivots columns into rows, turning wide data (many columns) into long data (fewer columns, more rows).'},
+    {q:'"Missing not at random" (MNAR) means:', options:['Data is missing purely by chance','The chance of being missing is related to the unobserved value itself','There is no missing data','Missingness is evenly spread across all variables'], correct:1, explain:'MNAR is the hardest missingness case — the reason a value is missing is tied to the value itself (e.g. sicker patients skipping a visit), which biases naive analysis.'}
+  ]
+},
+{
+  id:'w10', phase:4,
+  title:'Week 10 — Machine learning foundations',
+  objective:"Before building a clinical prediction model, you need the habits that keep a machine-learning result trustworthy: train/test splitting, cross-validation, regularization, and choosing the right evaluation metric for an imbalanced health outcome. Skipping this is the single most common reason a promising model fails to replicate. Added because the original plan jumped straight into a full clinical ML week without this scaffolding.",
+  hoursMin:6, hoursMax:8,
+  tools:[{name:'Python', status:'core'},{name:'scikit-learn', status:'new'}],
+  days:[
+    {id:'w10-mon', text:'Theory: why a model can score well on training data and fail on new patients — overfitting, and why cross-validation exists.'},
+    {id:'w10-tue', text:"Tooling: scikit-learn's train_test_split, cross_val_score/KFold, and a simple logistic regression baseline."},
+    {id:'w10-wed', text:"Data engineering: build features from a Kaggle clinical dataset (the same heart-failure dataset you'll use in Week 11), and check the outcome's prevalence before choosing a metric."},
+    {id:'w10-thu', text:'Lab: fit a regularized model (Lasso/Ridge logistic regression) with cross-validated hyperparameter tuning (GridSearchCV), and compare accuracy, precision/recall, and AUC.'},
+    {id:'w10-fri', text:'Review: write a short note on which metric you would report to a clinical audience and why — e.g. recall matters more than precision when missing a disease case is costlier than a false alarm.'}
+  ],
+  howto:{steps:[
+    'Split data with train_test_split(X, y, test_size=0.2, stratify=y) — stratify matters when the outcome is imbalanced.',
+    'Set up a pipeline (sklearn.pipeline.Pipeline) so scaling and modeling steps happen consistently across folds.',
+    "Tune regularization strength with GridSearchCV(pipeline, param_grid, cv=5, scoring='roc_auc').",
+    'Fit the tuned model on the training set, then evaluate once on the held-out test set — never tune based on test-set performance.',
+    'Report accuracy, precision, recall, and AUC together, and explicitly state which one you would prioritize for this clinical outcome and why.'
+  ], tutorial:{name:'scikit-learn official "Cross-validation" and "Model evaluation" guides', url:'https://scikit-learn.org/stable/modules/cross_validation.html'}},
+  outcomes:['Explain overfitting and why cross-validation guards against it.','Tune a regularized model without leaking test-set information.','Choose and justify an evaluation metric for a specific clinical outcome.'],
+  datasets:[{name:'Kaggle — Heart Failure Clinical Records (also used Week 11)', url:'https://www.kaggle.com/datasets/andrewmvd/heart-failure-clinical-data'},{name:'Kaggle — Pima Indians Diabetes Database', url:'https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database'}],
+  github:[{name:'scikit-learn/scikit-learn', url:'https://github.com/scikit-learn/scikit-learn'}],
+  youtube:[{name:'StatQuest — "Cross Validation"', url:'https://www.youtube.com/results?search_query=statquest+cross+validation'},{name:'StatQuest — "ROC and AUC, Clearly Explained"', url:'https://www.youtube.com/results?search_query=statquest+roc+and+auc'}],
+  reading:['An Introduction to Statistical Learning (ISLR) — Ch. 5 (Resampling) and Ch. 6 (Regularization)','scikit-learn user guide — "Model evaluation: quantifying prediction quality"'],
+  deliverable:'10_ml_foundations.ipynb with a cross-validated, regularized baseline model and a written metric-choice justification.',
+  why:"This is the missing scaffolding that makes Week 11's survival/ML work rigorous rather than just running fit() and hoping — exactly the kind of foundational rigor a biostatistics-adjacent employer checks for before trusting your modeling results.",
+  quiz:[
+    {q:'stratify=y in train_test_split() ensures:', options:['The split is random with no other guarantee','The train and test sets preserve the same class proportions as the full dataset','The data is sorted first','Duplicate rows are removed'], correct:1, explain:'Stratifying keeps the outcome proportions consistent across splits, which matters most when the outcome is imbalanced.'},
+    {q:'Why should hyperparameters never be tuned using the held-out test set?', options:['It is against convention only, no real risk','It leaks information from the test set, making your performance estimate overly optimistic','It makes the model too slow','Test sets cannot be used for tuning by law'], correct:1, explain:'Tuning on the test set effectively lets the model "see" it, inflating your estimate of how well it will do on truly new data.'},
+    {q:'For a rare but serious disease, why might you prioritize recall over precision?', options:['Recall is always more important','Missing a true case (false negative) is costlier than a false alarm here','Precision cannot be computed for rare diseases','They mean the same thing'], correct:1, explain:'When the cost of missing a real case is high, recall (catching true positives) is worth prioritizing even if it means more false alarms.'}
+  ]
+},
+{
+  id:'w11', phase:4,
+  title:'Week 11 — ML & survival analysis for clinical prediction',
+  objective:'Risk-scoring tools — who gets readmitted, whose cancer recurs — are one of the largest applied-ML markets in health and biotech. Survival analysis handles the messy reality of patients who drop out of follow-up, which plain ML quietly pretends does not happen.',
+  hoursMin:8, hoursMax:10,
+  tools:[{name:'R or Python', status:'core'},{name:'survival / scikit-survival', status:'new'}],
+  days:[
+    {id:'w11-mon', text:'Theory: why survival analysis differs from standard regression — censoring, and why dropping patients with incomplete follow-up biases your results.'},
+    {id:'w11-tue', text:"Tooling: learn the survival package in R (or lifelines in Python — your call) and fit a Kaplan-Meier curve."},
+    {id:'w11-wed', text:'Data engineering: clean the Kaggle Heart Failure Clinical Records dataset and engineer 2–3 new features.'},
+    {id:'w11-thu', text:'Lab: fit a Cox proportional hazards model and a simple random forest classifier from Week 10, then compare their concordance/AUC.'},
+    {id:'w11-fri', text:'Review: write up which model you would actually trust in a clinical setting and why — interpretability vs. raw performance is a real trade-off, not a solved problem.'}
+  ],
+  howto:{steps:[
+    'Fit a Kaplan-Meier curve first with survival::survfit(Surv(time, status) ~ group, data = ...) before any modeling.',
+    'Check the log-rank test with survival::survdiff() for whether the groups differ significantly.',
+    'Fit the Cox model with coxph(Surv(time, status) ~ predictors, data = ...) and read the hazard ratios (exp(coef)) with their confidence intervals.',
+    'Fit a comparison random forest on the same predictors, treated as a binary classifier at a fixed time horizon, using the pipeline habits from Week 10.',
+    "Compare concordance (survival::concordance() for Cox, pROC::auc() for the forest) and write your trust verdict."
+  ], tutorial:{name:"STHDA's Cox Proportional Hazards Model walkthrough", url:'https://www.sthda.com/english/wiki/cox-proportional-hazards-model'}},
+  outcomes:['Explain censoring and why dropping incomplete follow-up patients biases a study.','Fit and correctly interpret a hazard ratio from a Cox model.','Argue, with evidence, whether you would trust a black-box model or an interpretable one in a clinical setting.'],
+  datasets:[{name:'Kaggle — Heart Failure Clinical Records', url:'https://www.kaggle.com/datasets/andrewmvd/heart-failure-clinical-data'},{name:'UCI — Breast Cancer Wisconsin (Diagnostic)', url:'https://archive.ics.uci.edu/dataset/17/breast+cancer+wisconsin+diagnostic'}],
+  github:[{name:'scikit-survival — survival analysis in Python', url:'https://github.com/sebp/scikit-survival'},{name:'lifelines — survival analysis in Python', url:'https://github.com/CamDavidsonPilon/lifelines'}],
+  youtube:[{name:'StatQuest — "Kaplan-Meier Curves and the Log-Rank Test"', url:'https://www.youtube.com/results?search_query=statquest+kaplan+meier'},{name:'StatQuest — "Cox Proportional Hazards"', url:'https://www.youtube.com/results?search_query=statquest+cox+proportional+hazards'}],
+  reading:['An Introduction to Statistical Learning (ISLR) — Ch. 11 (Survival Analysis), free at statlearning.com','Biostatistics for Biomedical Research, Frank Harrell — chapter on survival models (free draft at hbiostat.org)'],
+  deliverable:'11_survival_model.R (or .py) with a Kaplan-Meier plot, a Cox model summary, and your written model-trust verdict.',
+  why:'This week is where "data scientist" and "biostatistician" fully overlap — clinical risk models are hired for on both sides, and the survival-analysis framing is what separates a biostat-literate applicant from a generic ML one.',
+  quiz:[
+    {q:'Censoring in survival data refers to:', options:['Removing outliers','Not knowing the exact event time for a patient still followed, or lost to follow-up','Data entry errors','Missing demographic fields'], correct:1, explain:'A censored patient has not (yet) experienced the event by the time data collection ends, so their exact event time is unknown — not their existence.'},
+    {q:'A hazard ratio of 1.8 for a risk factor means:', options:['The risk factor doubles survival time','At any given moment, exposed patients have about 1.8x the instantaneous risk of the event versus unexposed','80% of patients died','The result is not interpretable'], correct:1, explain:'The hazard ratio compares instantaneous event rates between groups at any given time point, not overall survival time directly.'},
+    {q:'Dropping all patients with incomplete follow-up before fitting a model tends to:', options:['Have no effect on results','Bias results, since dropout is rarely random with respect to the outcome','Always improve accuracy','Only affect sample size, not conclusions'], correct:1, explain:'Patients drop out for reasons often related to their health status, so removing them non-randomly skews the remaining sample.'}
+  ]
+},
+{
+  id:'w12', phase:4,
+  title:'Week 12 — AI & NLP for clinical and public-health text',
+  objective:'A huge share of health data — clinical notes, WHO situation reports, Ministry of Health bulletins — is unstructured text, not tidy columns. Large language models can now extract structured fields from that text far faster than manual abstraction, one of the fastest-growing hiring categories in health-adjacent AI.',
+  hoursMin:8, hoursMax:10,
+  tools:[{name:'Python', status:'core'},{name:'spaCy / LLM APIs', status:'new'}],
+  days:[
+    {id:'w12-mon', text:'Theory: what NLP does differently for clinical text — abbreviations, and negation ("no evidence of pneumonia" does not mean "pneumonia").'},
+    {id:'w12-tue', text:'Tooling: install spaCy plus a biomedical model (scispaCy) and run named entity recognition on 5 sample synthetic clinical notes.'},
+    {id:'w12-wed', text:'Data engineering: write a structured-output prompt (a JSON schema) asking an LLM API to pull diagnosis, medication, and dosage out of 10 synthetic clinical notes, and compare its accuracy against the spaCy NER pass.'},
+    {id:'w12-thu', text:'Lab: deliberately feed the LLM three ambiguous or edge-case notes — negation, non-English terms, missing information — and document exactly where it fails silently.'},
+    {id:'w12-fri', text:'Review: write a one-page "when would I trust this in production" memo covering sensitivity/specificity trade-offs and what a human-in-the-loop review step would look like.'}
+  ],
+  howto:{steps:[
+    "Install spaCy and a scispaCy biomedical model (pip install scispacy plus the model wheel URL from scispaCy's releases page).",
+    'Run it over your 5 sample notes and inspect doc.ents — note what it catches and what it misses, especially negation.',
+    'Separately, write a system prompt for an LLM API call that demands JSON-only output matching a schema: diagnosis, medication, dosage.',
+    'Run both pipelines on the same 10 notes and build a small comparison table: entity, spaCy result, LLM result, which was right.',
+    'Feed both pipelines your 3 adversarial notes (negation, non-English terms, missing data) and document every silent failure you find.'
+  ], tutorial:{name:"scispaCy's official documentation and model list", url:'https://allenai.github.io/scispacy/'}},
+  outcomes:['Explain why negation handling makes clinical text different from generic NLP tasks.','Build a structured-output prompt that reliably extracts fields from unstructured text.','Name at least one concrete failure mode you would want a human reviewer to catch before this touched production.'],
+  datasets:[{name:'n2c2 / i2b2 NLP shared-task datasets (de-identified, public, credentialed access)', url:'https://portal.dbmi.hms.harvard.edu/'},{name:'Synthea — generate fully synthetic patient narrative notes yourself', url:'https://github.com/synthetichealth/synthea'}],
+  github:[{name:'allenai/scispacy', url:'https://github.com/allenai/scispacy'},{name:'huggingface/transformers — official examples, including token classification', url:'https://github.com/huggingface/transformers'}],
+  youtube:[{name:'"Clinical NLP with spaCy and scispaCy" — search on YouTube', url:'https://www.youtube.com/results?search_query=clinical+nlp+scispacy+tutorial'},{name:'Hugging Face — "NLP Course, Token Classification"', url:'https://www.youtube.com/results?search_query=huggingface+nlp+course+token+classification'}],
+  reading:['Hugging Face NLP Course — Token Classification chapter, free at huggingface.co/course','"Clinical Natural Language Processing" — search "clinical NLP challenges review paper" for a current open-access primer'],
+  deliverable:'12_clinical_nlp_comparison.ipynb comparing spaCy NER vs. LLM extraction on synthetic notes, plus the one-page trust memo.',
+  why:'AI-for-health is where the field is visibly moving, and this week most directly overlaps with skills you already use daily — prompting and structuring LLM output.',
+  quiz:[
+    {q:'"No evidence of pneumonia" in a clinical note is an example of why NLP needs to handle:', options:['Spelling correction','Negation','Translation','Encryption'], correct:1, explain:'Negation flips the meaning of the entity mentioned, so a naive extractor that ignores it would wrongly flag pneumonia as present.'},
+    {q:'A structured-output prompt for an LLM typically specifies:', options:['Nothing beyond the note text','A JSON schema the model must fill in exactly', 'A random sampling temperature only', 'The patient\'s name'], correct:1, explain:'Demanding a fixed JSON schema makes the output parseable and comparable across notes, rather than free-form prose.'},
+    {q:'A model that confidently invents a dosage it never saw in the note is:', options:['A minor formatting issue','A dangerous silent failure mode that a human reviewer must catch','Expected and fine to ship','Only a problem in non-English notes'], correct:1, explain:'Fabricated clinical details are one of the most dangerous failure modes in health AI, since they look plausible but are unsafe if acted on.'}
+  ]
+},
+{
+  id:'w13', phase:5,
+  title:'Week 13 — Genomics analysis project',
+  objective:'Differential expression analysis — which genes turn up or down between two conditions — is the single most common computational-biology task in biotech R&D: drug discovery, vaccine research, and outbreak-pathogen work all run some version of this pipeline.',
+  hoursMin:8, hoursMax:10,
+  tools:[{name:'R', status:'core'},{name:'DESeq2 (Bioconductor)', status:'new'}],
+  days:[
+    {id:'w13-mon', text:'Theory: what "differential expression" means, in plain terms — which genes are turned up or down between two conditions, and why that is biologically meaningful.'},
+    {id:'w13-tue', text:"Tooling: install DESeq2 and walk through its official vignette on a small example dataset."},
+    {id:'w13-wed', text:'Data engineering: apply DESeq2 to your Week 6 GEO dataset, or pull a fresh count matrix via TCGAbiolinks if you want cancer data instead.'},
+    {id:'w13-thu', text:'Lab: generate a volcano plot and a heatmap of your top differentially expressed genes.'},
+    {id:'w13-fri', text:'Review: pick your top 3 genes, look up their known function in NCBI Gene, and write one sentence per gene on why the result is biologically plausible.'}
+  ],
+  howto:{steps:[
+    'Build a count matrix and a colData sample sheet (condition labels) from your Week 6 dataset.',
+    'Construct the DESeqDataSet with DESeqDataSetFromMatrix(countData, colData, design = ~ condition).',
+    'Run the single wrapper function DESeq(dds) — it handles size-factor normalization, dispersion estimation, and the test in one call.',
+    'Extract results with results(dds) and shrink the log-fold-changes with lfcShrink() for a cleaner volcano plot.',
+    'Plot with EnhancedVolcano or a manual ggplot2 volcano plot, then pull the top genes by adjusted p-value for a pheatmap() heatmap.'
+  ], tutorial:{name:'The official DESeq2 vignette', url:'https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html'}},
+  outcomes:['Explain what "differentially expressed" means without using the word "differential."','Run a full DESeq2 pipeline from a raw count matrix to a volcano plot.',"Look up a gene's known function and judge whether a result is biologically plausible."],
+  datasets:[{name:'Same GEO dataset from Week 6, or a new one via GEO search', url:'https://www.ncbi.nlm.nih.gov/geo/'},{name:'TCGA data via TCGAbiolinks (cancer genomics)', url:'https://bioconductor.org/packages/release/bioc/html/TCGAbiolinks.html'}],
+  github:[{name:'DESeq2 official vignette and source', url:'https://github.com/thelovelab/DESeq2'},{name:'nf-core/rnaseq — production-grade RNA-seq pipeline (read, no need to run fully)', url:'https://github.com/nf-core/rnaseq'}],
+  youtube:[{name:'StatQuest — "DESeq2, part 1: Library Normalization"', url:'https://www.youtube.com/results?search_query=statquest+deseq2'}],
+  reading:['DESeq2 Bioconductor vignette (read it end to end)','Bioinformatics Data Skills, Vince Buffalo — Ch. 8–9'],
+  deliverable:'13_deseq2_volcano.png and a heatmap image, with a short biological interpretation of your top genes.',
+  why:'This is the deliverable that reads as "biotech-ready" rather than just "health-data-ready" — a real molecular analysis pipeline on your CV puts you in range of R&D and diagnostics roles, not only public-health-agency ones.',
+  quiz:[
+    {q:'"Differentially expressed" between two conditions means a gene is:', options:['Mutated','Turned up or down in one condition relative to the other','Absent from the genome','Duplicated'], correct:1, explain:'It refers to a statistically supported change in expression level (up or down) between the two groups being compared.'},
+    {q:'Why does DESeq2 normalize by size factors before testing?', options:['To remove genes entirely','To correct for differences in total sequencing depth between samples','To sort genes alphabetically','It is purely cosmetic'], correct:1, explain:'Samples sequenced to different depths are not directly comparable until normalized, or depth differences would look like biological differences.'},
+    {q:'A volcano plot typically shows:', options:['Time vs. temperature','Fold-change vs. statistical significance for each gene','Patient age vs. outcome','Only p-values with no effect size'], correct:1, explain:'Volcano plots put effect size (fold-change) on one axis and significance (often -log10 p-value) on the other, highlighting genes that are both large and significant.'}
+  ]
+},
+{
+  id:'w14', phase:5,
+  title:'Week 14 — Health data engineering & interoperability (FHIR & SQL)',
+  objective:'FHIR is the actual data-exchange standard behind real hospital and public-health IT systems — DHIS2, OpenMRS, and most national health information systems across Africa included. This week also reuses your own Supabase/Postgres skills, since that is not so different from a lightweight health-records database.',
+  hoursMin:7, hoursMax:9,
+  tools:[{name:'Python', status:'core'},{name:'SQL / Supabase', status:'new'}],
+  days:[
+    {id:'w14-mon', text:'Theory: why healthcare needed a common data-exchange standard, and what problem FHIR (Fast Healthcare Interoperability Resources) actually solves.'},
+    {id:'w14-tue', text:'Tooling: explore the SMART Health IT public FHIR sandbox and pull sample patient records via its API.'},
+    {id:'w14-wed', text:'Data engineering: use the Synthea synthetic patient generator to create a batch of fake-but-realistic FHIR patient records, then load them into a Supabase Postgres project so you\'re writing SQL against infrastructure you already know how to spin up.'},
+    {id:'w14-thu', text:'Lab: write SQL queries answering 3 questions (e.g. "how many synthetic patients have a diabetes diagnosis and are over 50?").'},
+    {id:'w14-fri', text:'Review: sketch a simple ETL diagram (source → transform → load) documenting the pipeline you just built.'}
+  ],
+  howto:{steps:[
+    'Install Synthea and run it locally for a small population (java -jar synthea-with-dependencies.jar -p 100).',
+    'Point the FHIR exporter at a folder, then write a small Python script to flatten the FHIR bundles into rows.',
+    'Create a Supabase project, open its SQL editor, and create a patients table matching your flattened fields (CREATE TABLE ...).',
+    'Insert the flattened records — either paste generated INSERT statements into the SQL editor, or use the Supabase Python client for a bulk load.',
+    'Write your 3 SQL questions as SELECT queries directly in the Supabase SQL editor, then sketch the ETL diagram from what you just did.'
+  ], tutorial:{name:"Supabase's guide to creating tables and running SQL", url:'https://supabase.com/docs/guides/database/tables'}},
+  outcomes:['Explain, in one sentence, what problem FHIR solves that a plain CSV export does not.','Write a SQL query that answers a specific clinical question against a patient database.','Sketch an ETL pipeline (source → transform → load) for data you built yourself.'],
+  datasets:[{name:'Synthea — synthetic patient population generator', url:'https://github.com/synthetichealth/synthea'},{name:'SMART Health IT sandbox (live FHIR test server)', url:'https://sandbox.smarthealthit.org/'}],
+  github:[{name:'synthetichealth/synthea', url:'https://github.com/synthetichealth/synthea'},{name:'smart-on-fhir — official SMART Health IT repos', url:'https://github.com/smart-on-fhir'}],
+  youtube:[{name:'"FHIR fundamentals explained" — search on YouTube', url:'https://www.youtube.com/results?search_query=fhir+fundamentals+explained'},{name:'"Synthea synthetic patient data tutorial" — search on YouTube', url:'https://www.youtube.com/results?search_query=synthea+synthetic+patient+data+tutorial'}],
+  reading:['HL7.org — FHIR Overview (official specification introduction)','Supabase docs — "Database" section'],
+  deliverable:'A Supabase-hosted database of synthetic FHIR patients, 3 SQL query answers, and an ETL diagram image.',
+  why:'This is the one week that asks you to genuinely learn a new language — SQL — but it costs almost nothing extra, since you already maintain a Supabase project. The "new" skill rides on infrastructure you have already paid the setup cost for.',
+  quiz:[
+    {q:'FHIR mainly solves the problem of:', options:['Storing images','Letting different health IT systems exchange patient data in a consistent format','Encrypting passwords','Compressing large files'], correct:1, explain:'FHIR standardizes how clinical data is represented and exchanged so systems built by different vendors can interoperate.'},
+    {q:'In "source → transform → load" (ETL), the "transform" step is where you:', options:['Collect raw data','Clean, reshape, and reformat data into its target structure','Delete the database','Write the final report'], correct:1, explain:'Transform is the middle step where raw extracted data is cleaned and reshaped before being loaded into its destination.'},
+    {q:'A SQL query filtering patients where diagnosis = \'diabetes\' AND age > 50 returns:', options:['All patients regardless of condition','Only patients meeting both conditions at once','Only patients meeting either condition','A syntax error always'], correct:1, explain:'AND requires both conditions to be true for a row to be included in the result.'}
+  ]
+},
+{
+  id:'w15', phase:6,
+  title:'Week 15 — Automated reporting & dashboards',
+  objective:'Every health ministry and NGO drowns in manual weekly reports. Automating this — your Week 1 table plus your Week 4 map, regenerated per county — is one of the highest-leverage things a junior data person can build inside a public-health org.',
+  hoursMin:6, hoursMax:8,
+  tools:[{name:'R (Quarto)', status:'new'},{name:'Power BI or React', status:'core'}],
+  days:[
+    {id:'w15-mon', text:'Theory: literate programming — code and narrative living in the same document, so the report and the analysis can never silently drift apart.'},
+    {id:'w15-tue', text:'Tooling: set up a basic .qmd file with a YAML header and render it to both HTML and PDF.'},
+    {id:'w15-wed', text:'Data engineering: use params: in the YAML to filter data by region, e.g. params: region: "Kisumu", so one template serves every county.'},
+    {id:'w15-thu', text:'Lab: combine your Week 1 table and Week 4 map into one report, then write a loop that renders a separate PDF for every Kenyan county automatically from a single script.'},
+    {id:'w15-fri', text:'Review: confirm the date updates automatically (Sys.Date()) and formatting stays consistent across all 47 files, then sketch how this same sitrep could live as a Power BI dashboard or a small Next.js page instead.'}
+  ],
+  howto:{steps:[
+    'Create a .qmd file with a YAML header that declares params: region: "Kisumu".',
+    'Reference params$region inside an R code chunk to filter your Week 1 table and Week 4 map to just that region.',
+    'Render once manually (quarto render report.qmd -P region:Kisumu) to confirm it works for a single county.',
+    'Write an R script that loops over all 47 county names and calls quarto::quarto_render() with a different -P region:<county> each time.',
+    'Spot-check 2–3 of the rendered PDFs for correct filtering and consistent formatting before calling it done.'
+  ], tutorial:{name:'A step-by-step guide to parameterized reporting in R using Quarto', url:'https://rfortherestofus.com/2024/06/parameterized-reporting-quarto'}},
+  outcomes:['Explain what a parameter does in a Quarto document, and why it beats copy-pasting a template 47 times.','Render the same report template for a different subset of data by changing one line.','Justify, for a specific client, whether Quarto, Power BI, or React is the better delivery format.'],
+  datasets:[{name:'Reuse Week 1 + Week 4 outputs — no new dataset needed', url:'https://www.epirhandbook.com/en/'}],
+  github:[{name:'quarto-dev/quarto-cli — official repo with example reports', url:'https://github.com/quarto-dev/quarto-cli'}],
+  youtube:[{name:'"Parameterized reports with Quarto" — search on YouTube', url:'https://www.youtube.com/results?search_query=parameterized+reports+quarto'}],
+  reading:['The Epidemiologist R Handbook — Ch. 40 (Reports with R Markdown)','Quarto.org — "Parameters" documentation page'],
+  deliverable:'weekly_sitrep_template.qmd producing 47 PDF files (one per Kenyan county) from a single script, plus a short written comparison of Quarto vs. Power BI vs. React for this use case.',
+  why:'This week is deliberately built to let you show range without extra build cost — the reasoning about which tool fits which client is itself the skill, and it is one you can only demonstrate credibly because you already know all three options.',
+  quiz:[
+    {q:'A "parameter" in a Quarto document lets you:', options:['Add color to the report','Re-render the same template for different data (e.g. a different region) by changing one value','Delete unused code','Compile faster with no other effect'], correct:1, explain:'Parameters are variables set at render time, letting one template file produce many different, filtered outputs.'},
+    {q:'Why use Sys.Date() instead of a hardcoded date in the report?', options:['It runs slower','The report always shows the actual date it was generated, without manual edits','It changes the data','It is required by Quarto'], correct:1, explain:'Sys.Date() pulls the current system date automatically each time the report renders, keeping it accurate without manual updates.'},
+    {q:'Choosing Power BI over a custom React dashboard for a health-ministry client mainly comes down to:', options:['Power BI is always better','Whichever fits the client\'s existing tools, technical capacity, and maintenance needs','React is never appropriate for health data','There is no real difference'], correct:1, explain:'Tool choice here is a client-fit decision — what they can maintain and already use — not a technical superiority question.'}
+  ]
+},
+{
+  id:'w16', phase:6,
+  title:'Week 16 — Capstone, portfolio & application positioning',
+  objective:'This is where sixteen weeks of scattered deliverables become one coherent narrative: "I am a data scientist who already works like a biostatistician." That narrative is exactly what needs to be on the desk of an admissions reader, and what a KEMRI, Amref, or Africa CDC interviewer wants to see.',
+  hoursMin:8, hoursMax:10,
+  tools:[{name:'Markdown', status:'core'},{name:'React/Next.js or GitHub Pages', status:'core'}],
+  days:[
+    {id:'w16-mon', text:'GitHub cleanup across all 16 weeks — comment the code, and add a renv.lock or requirements.txt to each repo for reproducibility.'},
+    {id:'w16-tue', text:'Write a README for each project answering what the problem was, what data you used, and what the results were — then write one master README tying all 16 weeks into a single narrative arc.'},
+    {id:'w16-wed', text:'Build the portfolio site itself — GitHub Pages, Quarto, or a small Next.js page — linking all 16 weeks in one place.'},
+    {id:'w16-thu', text:'Write a statement-of-purpose bridge paragraph connecting your strongest 2–3 deliverables (the malaria Table 1 and facility-access map, or the clinical-NLP week, are strong candidates) to your stated interest in African public health research.'},
+    {id:'w16-fri', text:'Mock interview prep: write your own answers to "explain a p-value to a nurse," "how do you handle missing medical data," and — pulling from Week 12 — "walk me through a project where you used AI/ML responsibly in a health context."'}
+  ],
+  howto:{steps:[
+    'Go repo by repo across all 16 weeks and add a short header comment plus a requirements.txt or renv::snapshot() output to each.',
+    'Write each project\'s README using the same three-question template: what was the problem, what data did you use, what did you find.',
+    'Pick a portfolio format — GitHub Pages is fastest; a Next.js page if you want more control — and link every week\'s repo from one homepage.',
+    'Draft the statement-of-purpose bridge paragraph: start from your strongest deliverable and work backward to why it matters.',
+    'Write full answers to the three mock-interview questions, then read them aloud once — anything that sounds memorized rather than understood needs a rewrite.'
+  ], tutorial:{name:"GitHub Pages' quick-start guide for hosting a static portfolio site", url:'https://docs.github.com/en/pages/quick-start'}},
+  outcomes:['Point to one artifact from this curriculum and explain, unprompted, why it belongs on a grad-school application.','Answer "explain a p-value to a nurse" without reaching for jargon.','Walk someone through your AI/ML-in-health project and name its actual limitations, not just its results.'],
+  datasets:[{name:'No new dataset — this week is synthesis', url:''}],
+  github:[{name:'GitHub Pages documentation', url:'https://docs.github.com/en/pages'}],
+  youtube:[{name:'"Building a data science portfolio on GitHub" — search on YouTube', url:'https://www.youtube.com/results?search_query=data+science+portfolio+github'}],
+  reading:['Skim 2–3 real biostatistics/bioinformatics GitHub portfolios for structure ideas','Reread target program admissions pages with your finished portfolio in hand and note where each project maps to a stated program strength'],
+  deliverable:'A live portfolio site linking all 16 weeks, a master README, a reusable statement-of-purpose paragraph, and written interview-answer notes.',
+  why:'Everything before this week produced evidence. This week turns that evidence into the actual argument you will be making, in slightly different words, in a personal statement and in an interview room.',
+  quiz:[
+    {q:'A good project README should always answer:', options:['Only the code language used','What the problem was, what data was used, and what was found','Only your name and date','Nothing — code speaks for itself'], correct:1, explain:'These three questions are what a reader (recruiter, professor, collaborator) actually needs to evaluate the work quickly.'},
+    {q:'A strong statement-of-purpose bridge paragraph should:', options:['List every tool you have ever used','Start from a concrete deliverable and work backward to why it matters for your stated interest','Avoid mentioning any specific project','Be identical for every program you apply to'], correct:1, explain:'Concrete evidence anchored to a real project is far more persuasive than abstract claims of interest or skill.'},
+    {q:'When asked "explain a p-value to a nurse," the best approach is:', options:['Recite the formal statistical definition verbatim','Translate the idea into plain language without losing its actual meaning','Say it cannot be explained simply','Change the subject'], correct:1, explain:'Being able to translate technical ideas accurately into plain language is itself a tested communication skill in interviews.'}
+  ]
+}
+];
+
+/* =========================================================
+   STORAGE KEYS
+   ========================================================= */
+const TASK_KEY = 'biostat16_progress_v1';
+const QUIZ_KEY = 'biostat16_quiz_v1';
+const SETTINGS_KEY = 'biostat16_settings_v1';
+
+let completed = new Set();
+let quizState = {};   // { weekId: { answers:[idx...], submitted:bool, score:n, total:n } }
+let settings = { name:'', start:'', hours:8 };
+
+function loadLocal(){
+  try{ const t = localStorage.getItem(TASK_KEY); if(t) completed = new Set(JSON.parse(t)); }catch(e){}
+  try{ const q = localStorage.getItem(QUIZ_KEY); if(q) quizState = JSON.parse(q); }catch(e){}
+  try{ const s = localStorage.getItem(SETTINGS_KEY); if(s) settings = Object.assign(settings, JSON.parse(s)); }catch(e){}
+}
+function saveTasks(){ localStorage.setItem(TASK_KEY, JSON.stringify(Array.from(completed))); }
+function saveQuiz(){ localStorage.setItem(QUIZ_KEY, JSON.stringify(quizState)); }
+function saveSettings(){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+function allTaskIds(){ return weeks.flatMap(w=>w.days.map(d=>d.id)); }
+function weekComplete(w){ return w.days.every(d=>completed.has(d.id)); }
+function phaseNameFor(idx){ return phases[weeks[idx].phase-1].name; }
+
+function linkList(items){
+  return items.filter(i=>i.url).map(i=>`<li><a href="${i.url}" target="_blank" rel="noopener">${i.name}</a></li>`).join('');
+}
+
+function buildStackTable(){
+  const rows = ['<tr><th>Tool</th><th>Status</th><th>Where it shows up</th></tr>'];
+  stackRows.forEach(r=>{
+    rows.push(`<tr><td>${r[0]}</td><td><span class="status-pill ${r[1]}">${r[2]}</span></td><td>${r[3]}</td></tr>`);
+  });
+  document.getElementById('stackTable').innerHTML = rows.join('');
+}
+
+/* =========================================================
+   PROGRESS BAR
+   ========================================================= */
+function updateProgressBar(){
+  const all = allTaskIds();
+  const done = all.filter(id=>completed.has(id)).length;
+  const pct = all.length ? Math.round((done/all.length)*100) : 0;
+  document.getElementById('pct-label').textContent = pct + '%';
+  document.getElementById('task-label').textContent = done + ' of ' + all.length + ' tasks complete';
+  document.getElementById('progress-fill').style.width = pct + '%';
+
+  const dotsWrap = document.getElementById('week-dots');
+  dotsWrap.innerHTML = '';
+  weeks.forEach((w,i)=>{
+    const dot = document.createElement('span');
+    dot.className = 'week-dot' + (weekComplete(w) ? ' complete' : '');
+    dot.textContent = 'W' + (i+1);
+    dotsWrap.appendChild(dot);
+  });
+
+  const wc = weeks.filter(weekComplete).length;
+  document.getElementById('sideSummary').textContent = wc + ' of ' + weeks.length + ' weeks complete';
+}
+
+/* =========================================================
+   VIEW STATE — 'overview' or a week id string
+   ========================================================= */
+let currentView = 'overview';
+
+function setView(id){
+  currentView = id;
+  render();
+  window.scrollTo({top:0, behavior:'auto'});
+  if(window.innerWidth <= 860) closeSidebar();
+}
+
+function render(){
+  const extras = document.getElementById('overviewExtras');
+  if(currentView === 'overview'){
+    extras.style.display = '';
+    renderOverview();
+  } else {
+    extras.style.display = 'none';
+    renderWeekView(currentView);
+  }
+  renderSidebar();
+  updateProgressBar();
+}
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+function renderSidebar(){
+  const nav = document.getElementById('sidebarNav');
+  let html = '';
+  let curPhase = 0;
+  weeks.forEach((w,i)=>{
+    if(w.phase !== curPhase){
+      curPhase = w.phase;
+      html += `<div class="phase-nav-name">${curPhase}. ${phases[curPhase-1].name}</div>`;
+    }
+    const active = currentView === w.id ? ' active' : '';
+    html += `<a class="week-link ${weekComplete(w)?'complete':''}${active}" data-week="${w.id}"><span class="dot"></span>${w.title.replace(/^Week \d+ — /,'W'+(i+1)+' — ')}</a>`;
+  });
+  nav.innerHTML = html;
+  nav.querySelectorAll('.week-link').forEach(el=>{
+    el.addEventListener('click', ()=> setView(el.dataset.week));
+  });
+  document.getElementById('overviewLink').classList.toggle('active', currentView === 'overview');
+}
+
+function openSidebar(){ document.getElementById('sidebar').classList.add('open'); document.getElementById('overlay').classList.add('show'); }
+function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
+
+/* =========================================================
+   PACE CALCULATOR
+   ========================================================= */
+function totalHoursRange(){
+  let min=0,max=0;
+  weeks.forEach(w=>{ min+=w.hoursMin; max+=w.hoursMax; });
+  return {min,max};
+}
+function updatePace(){
+  const t = totalHoursRange();
+  const avg = (t.min+t.max)/2;
+  const capacityEl = document.getElementById('paceHours');
+  const capacity = Math.max(1, parseFloat(capacityEl.value) || 8);
+  const weeksNeeded = Math.ceil(avg / capacity);
+  const resultEl = document.getElementById('paceResult');
+  if(weeksNeeded <= 16){
+    resultEl.innerHTML = `At <b>${capacity} hrs/week</b>, the full plan (~<b>${t.min}–${t.max} total hrs</b>) fits comfortably inside the 16-week schedule.`;
+  } else {
+    resultEl.innerHTML = `At <b>${capacity} hrs/week</b>, the full plan (~<b>${t.min}–${t.max} total hrs</b>) will realistically take about <b>${weeksNeeded} weeks</b> rather than 16 — that's fine, this is meant to build skill, not to be rushed.`;
+  }
+  document.getElementById('paceNoteSmall').textContent = `At current settings: about ${weeksNeeded} weeks to finish.`;
+  settings.hours = capacity;
+  saveSettings();
+}
+
+/* =========================================================
+   QUIZ
+   ========================================================= */
+function ensureQuizState(w){
+  if(!quizState[w.id]) quizState[w.id] = { answers:new Array(w.quiz.length).fill(null), submitted:false, score:0 };
+  return quizState[w.id];
+}
+
+function renderQuiz(w){
+  const st = ensureQuizState(w);
+  let html = `<div class="qb-title"><span>Quick check — do you know this week's material?</span>`;
+  if(st.submitted) html += `<span>${st.score}/${w.quiz.length} correct</span>`;
+  html += `</div>`;
+
+  w.quiz.forEach((q, qi)=>{
+    html += `<div class="quiz-q" data-week="${w.id}" data-q="${qi}"><p>${qi+1}. ${q.q}</p>`;
+    q.options.forEach((opt, oi)=>{
+      let cls = 'quiz-opt';
+      if(st.answers[qi] === oi) cls += ' selected';
+      if(st.submitted){
+        if(oi === q.correct) cls += ' correct';
+        else if(st.answers[qi] === oi && oi !== q.correct) cls += ' incorrect';
+      }
+      html += `<div class="${cls}" data-opt="${oi}">${opt}</div>`;
+    });
+    html += `<div class="quiz-explain ${st.submitted?'show':''}">${st.submitted ? q.explain : ''}</div></div>`;
+  });
+
+  if(st.submitted){
+    const pass = st.score >= Math.ceil(w.quiz.length*0.6);
+    html += `<div class="quiz-result ${pass?'pass':'fail'}">${pass ? "Solid — you have this week's core ideas." : "Worth a re-read before moving on."}</div>`;
+    html += `<button class="quiz-retake" data-retake="${w.id}">Retake quiz</button>`;
+  } else {
+    html += `<button class="quiz-submit" data-submit="${w.id}">Check my answers</button>`;
+  }
+  return html;
+}
+
+function attachQuizHandlers(container, w){
+  container.querySelectorAll('.quiz-q').forEach(qEl=>{
+    const qi = parseInt(qEl.dataset.q,10);
+    qEl.querySelectorAll('.quiz-opt').forEach(optEl=>{
+      optEl.addEventListener('click', ()=>{
+        const st = ensureQuizState(w);
+        if(st.submitted) return;
+        st.answers[qi] = parseInt(optEl.dataset.opt,10);
+        saveQuiz();
+        refreshOneWeekQuiz(w);
+      });
+    });
+  });
+  const submitBtn = container.querySelector('[data-submit]');
+  if(submitBtn) submitBtn.addEventListener('click', ()=>{
+    const st = ensureQuizState(w);
+    let score = 0;
+    w.quiz.forEach((q,qi)=>{ if(st.answers[qi] === q.correct) score++; });
+    st.score = score; st.submitted = true;
+    saveQuiz();
+    refreshOneWeekQuiz(w);
+  });
+  const retakeBtn = container.querySelector('[data-retake]');
+  if(retakeBtn) retakeBtn.addEventListener('click', ()=>{
+    quizState[w.id] = { answers:new Array(w.quiz.length).fill(null), submitted:false, score:0 };
+    saveQuiz();
+    refreshOneWeekQuiz(w);
+  });
+}
+
+function refreshOneWeekQuiz(w){
+  const holder = document.querySelector(`.quiz-box[data-quiz-for="${w.id}"]`);
+  if(!holder) return;
+  holder.innerHTML = renderQuiz(w);
+  attachQuizHandlers(holder, w);
+}
+
+/* =========================================================
+   ICS REMINDER
+   ========================================================= */
+function icsDate(d){
+  return d.getUTCFullYear() + String(d.getUTCMonth()+1).padStart(2,'0') + String(d.getUTCDate()).padStart(2,'0');
+}
+function downloadICS(w, weekIndex){
+  const startStr = document.getElementById('setStart').value || settings.start;
+  if(!startStr){ alert('Set a start date first (Settings panel in the sidebar) so the reminder date can be calculated.'); return; }
+  const start = new Date(startStr + 'T00:00:00Z');
+  const due = new Date(start.getTime() + weekIndex*7*24*60*60*1000);
+  const dueStr = icsDate(due);
+  const uid = w.id + '-' + Date.now() + '@curriculum.local';
+  const ics = [
+    'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//curriculum//reminder//EN','BEGIN:VEVENT',
+    'UID:'+uid, 'DTSTAMP:'+icsDate(new Date())+'T000000Z',
+    'DTSTART;VALUE=DATE:'+dueStr, 'DTEND;VALUE=DATE:'+dueStr,
+    'SUMMARY:Deliverable due — ' + w.title,
+    'DESCRIPTION:' + w.deliverable.replace(/,/g,'\\,'),
+    'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:Reminder','TRIGGER:-P0DT9H0M0S','END:VALARM',
+    'END:VEVENT','END:VCALENDAR'
+  ].join('\r\n');
+  const blob = new Blob([ics], {type:'text/calendar'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = w.id + '_reminder.ics'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* =========================================================
+   RENDER WEEKS
+   ========================================================= */
+function matchesSearch(w, term){
+  if(!term) return true;
+  term = term.toLowerCase();
+  const hay = [w.title, w.objective, w.deliverable, w.why,
+    ...w.days.map(d=>d.text), ...w.tools.map(t=>t.name),
+    ...w.outcomes, ...w.reading].join(' ').toLowerCase();
+  return hay.includes(term);
+}
+
+/* =========================================================
+   OVERVIEW — clickable week cards, click one to open it alone
+   ========================================================= */
+function renderOverview(){
+  const term = document.getElementById('searchBox').value.trim();
+  const wrap = document.getElementById('content');
+  wrap.innerHTML = '';
+  let curPhase = 0;
+  let anyShown = false;
+
+  weeks.forEach((w,i)=>{
+    const show = matchesSearch(w, term);
+    if(show) anyShown = true;
+    if(w.phase !== curPhase){
+      curPhase = w.phase;
+      const divider = document.createElement('div');
+      divider.className = 'phase-divider';
+      divider.innerHTML = `<span class="num">Phase ${curPhase}</span><span class="name">${phases[curPhase-1].name}</span><span class="line"></span>`;
+      wrap.appendChild(divider);
+    }
+
+    const card = document.createElement('div');
+    card.className = 'week-card' + (weekComplete(w) ? ' complete' : '') + (show ? '' : ' hidden');
+    card.innerHTML = `
+      <div class="week-title">
+        <h2>${w.title}</h2>
+        <div class="obj">${w.objective}</div>
+      </div>
+      <div class="week-right">
+        <span class="hours-chip">${w.hoursMin}–${w.hoursMax} hrs</span>
+        <span class="week-badge ${weekComplete(w) ? 'complete' : ''}">${weekComplete(w) ? 'Complete' : w.days.filter(d=>completed.has(d.id)).length + '/' + w.days.length}</span>
+        <span class="chev-right">›</span>
+      </div>
+    `;
+    card.addEventListener('click', ()=> setView(w.id));
+    wrap.appendChild(card);
+  });
+
+  if(!anyShown){
+    const empty = document.createElement('div');
+    empty.className = 'empty-note';
+    empty.textContent = `No weeks match "${term}". Try a different term, or clear the search box.`;
+    wrap.appendChild(empty);
+  }
+}
+
+/* =========================================================
+   SINGLE WEEK VIEW — opened on its own from the sidebar/overview
+   ========================================================= */
+function renderWeekView(id){
+  const idx = weeks.findIndex(w=>w.id === id);
+  if(idx === -1){ currentView = 'overview'; render(); return; }
+  const w = weeks[idx];
+  const prev = weeks[idx-1], next = weeks[idx+1];
+  const wrap = document.getElementById('content');
+
+  const navBar = (suffix) => `
+    <div class="view-nav${suffix ? ' bottom' : ''}">
+      <button data-back="${suffix}">◀ Overview</button>
+      <span class="view-nav-pos">Week ${idx+1} of ${weeks.length} · Phase ${w.phase}: ${phases[w.phase-1].name}</span>
+      <span class="view-nav-arrows">
+        <button data-prev="${suffix}" ${prev ? '' : 'disabled'}>‹ Prev</button>
+        <button data-next="${suffix}" ${next ? '' : 'disabled'}>Next ›</button>
+      </span>
+    </div>`;
+
+  wrap.innerHTML = `
+    ${navBar('')}
+    <div class="week-block single ${weekComplete(w) ? 'complete' : ''}" id="${w.id}">
+      <div class="week-head">
+        <div class="week-title">
+          <h2>${w.title}</h2>
+          <div class="obj">${w.objective}</div>
+        </div>
+        <div class="week-right">
+          <span class="hours-chip">${w.hoursMin}–${w.hoursMax} hrs</span>
+          <span class="week-badge ${weekComplete(w) ? 'complete' : ''}">${weekComplete(w) ? 'Complete' : w.days.filter(d=>completed.has(d.id)).length + '/' + w.days.length}</span>
+        </div>
+      </div>
+      <div class="week-body">
+        <div class="tool-row">
+          ${w.tools.map(t=>`<span class="tool-chip ${t.status==='new'?'new':''}">${t.name}${t.status==='new' ? ' · new' : ''}</span>`).join('')}
+        </div>
+
+        <div class="day-list">
+          ${w.days.map(d=>`
+            <div class="day-item ${completed.has(d.id)?'checked':''}" data-id="${d.id}">
+              <input type="checkbox" id="${d.id}" ${completed.has(d.id)?'checked':''}>
+              <label for="${d.id}">${d.text}</label>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="howto-shell">
+          <div class="subhead">How to build this week's deliverable</div>
+          <ol class="howto-list">${w.howto.steps.map(s=>`<li>${s}</li>`).join('')}</ol>
+          <div class="tutorial-line">Tutorial: <a href="${w.howto.tutorial.url}" target="_blank" rel="noopener">${w.howto.tutorial.name}</a></div>
+        </div>
+
+        <div class="subhead">Datasets</div>
+        <div class="res-grid">
+          <div class="res-col"><ul>${linkList(w.datasets)}</ul></div>
+          <div class="res-col"><h4>GitHub</h4><ul>${linkList(w.github)}</ul></div>
+        </div>
+        <div class="res-grid">
+          <div class="res-col"><h4>YouTube</h4><ul>${linkList(w.youtube)}</ul></div>
+          <div class="res-col"><h4>Reading</h4><ul>${w.reading.map(r=>`<li>${r}</li>`).join('')}</ul></div>
+        </div>
+
+        <div class="deliverable-box"><strong>Deliverable:</strong> ${w.deliverable}</div>
+        <div class="outcomes-box">
+          <div class="ob-title">By the end of this week, you should be able to:</div>
+          <ul>${w.outcomes.map(o=>`<li>${o}</li>`).join('')}</ul>
+        </div>
+        <div class="why-box"><strong>Why this matters:</strong> ${w.why}</div>
+
+        <div class="quiz-box" data-quiz-for="${w.id}">${renderQuiz(w)}</div>
+
+        <div class="week-actions">
+          <button data-remind="${idx}">Add deliverable reminder to calendar (.ics)</button>
+        </div>
+      </div>
+    </div>
+    ${navBar('2')}
+  `;
+
+  wrap.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener('change', (e)=>{
+      const cid = e.target.id;
+      if(e.target.checked){ completed.add(cid); } else { completed.delete(cid); }
+      saveTasks();
+      render();
+    });
+  });
+
+  const remindBtn = wrap.querySelector('[data-remind]');
+  if(remindBtn) remindBtn.addEventListener('click', ()=> downloadICS(w, idx));
+
+  const quizHolder = wrap.querySelector(`.quiz-box[data-quiz-for="${w.id}"]`);
+  if(quizHolder) attachQuizHandlers(quizHolder, w);
+
+  wrap.querySelectorAll('[data-back]').forEach(b=> b.addEventListener('click', ()=> setView('overview')));
+  wrap.querySelectorAll('[data-prev]').forEach(b=> b.addEventListener('click', ()=> prev && setView(prev.id)));
+  wrap.querySelectorAll('[data-next]').forEach(b=> b.addEventListener('click', ()=> next && setView(next.id)));
+}
+
+/* =========================================================
+   DOCS SECTION (build documentation, in-page)
+   ========================================================= */
+function renderDocs(){
+  document.getElementById('docsPanel').innerHTML = `
+    <p style="margin:0 0 10px;">This is a single self-contained HTML file — no build step, no framework, no server. Progress, quiz answers, name, start date, and weekly-hours capacity are stored in your browser's <code>localStorage</code>, keyed to whichever device and browser you open it in — switching browsers or devices starts fresh.</p>
+
+    <p><b>Editing the curriculum.</b> All content lives in one JavaScript array called <code>weeks</code>, near the top of the <code>&lt;script&gt;</code> tag. Each week is an object with the same shape: <code>title</code>, <code>objective</code>, <code>hoursMin</code>/<code>hoursMax</code>, <code>tools</code>, <code>days</code>, <code>howto</code>, <code>datasets</code>, <code>github</code>, <code>youtube</code>, <code>reading</code>, <code>deliverable</code>, <code>outcomes</code>, <code>why</code>, and <code>quiz</code>. Find a week by its <code>id</code> (e.g. <code>w7</code>) and edit the fields directly — the sidebar, cards, and progress bar all read from this array, so nothing else needs to change.</p>
+
+    <p><b>Adding a week.</b> Copy an existing week object, give it a unique <code>id</code>, set its <code>phase</code> (1–6, matching the <code>phases</code> array above it), and fill in the fields. Reload and it appears automatically.</p>
+
+    <p><b>Reminders — what's real, and what needs a backend.</b> "Add deliverable reminder to calendar" downloads a real <code>.ics</code> file — Google Calendar, Outlook, and Apple Calendar will genuinely notify you from it, no server needed. A recurring automated <em>email</em> is different: a static page only runs while it's open in a browser, so it needs something running on a schedule elsewhere. The lightweight way to add that later is a scheduled GitHub Actions workflow (weekly <code>cron</code>) calling an email API (Resend, SendGrid, or similar) with your email kept as a GitHub Actions secret, not in this file.</p>
+
+    <p><b>Hosting on GitHub Pages.</b> Push this file to a repo as <code>index.html</code>, then enable it under Settings → Pages, pointing at the branch and root folder. It goes live at <code>https://&lt;username&gt;.github.io/&lt;repo-name&gt;/</code> within a few minutes.</p>
+
+    <p><b>Resetting progress.</b> There's no in-page reset button by design. To clear everything, open the browser console on this page and run <code>localStorage.clear()</code>, then reload.</p>
+
+    <p style="margin-bottom:0;"><b>Notes.</b> Dataset, repo, and tutorial links occasionally move — if one 404s, search the name directly on the listed platform. Nothing in Weeks 6, 12, or 14 uses real patient data — all clinical-note, genomic, and FHIR exercises use synthetic or fully de-identified public datasets.</p>
+  `;
+}
+
+/* =========================================================
+   INIT
+   ========================================================= */
+function init(){
+  loadLocal();
+  buildStackTable();
+  document.getElementById('setName').value = settings.name || '';
+  document.getElementById('setStart').value = settings.start || '';
+  document.getElementById('setHours').value = settings.hours || 8;
+  document.getElementById('paceHours').value = settings.hours || 8;
+
+  renderDocs();
+  updatePace();
+  render();
+
+  document.getElementById('searchBox').addEventListener('input', ()=>{
+    const term = document.getElementById('searchBox').value.trim();
+    if(term && currentView !== 'overview'){ currentView = 'overview'; }
+    render();
+  });
+  document.getElementById('paceHours').addEventListener('input', updatePace);
+
+  document.getElementById('overviewLink').addEventListener('click', ()=> setView('overview'));
+
+  document.getElementById('aboutToggle').addEventListener('click', ()=>{
+    document.getElementById('aboutPanel').classList.toggle('open');
+  });
+  document.getElementById('docsToggle').addEventListener('click', ()=>{
+    document.getElementById('docsPanel').classList.toggle('open');
+  });
+  document.getElementById('settingsToggle').addEventListener('click', ()=>{
+    document.getElementById('settingsPanel').classList.toggle('open');
+  });
+  ['setName','setStart','setHours'].forEach(id=>{
+    document.getElementById(id).addEventListener('change', ()=>{
+      settings.name = document.getElementById('setName').value;
+      settings.start = document.getElementById('setStart').value;
+      settings.hours = parseFloat(document.getElementById('setHours').value) || 8;
+      document.getElementById('paceHours').value = settings.hours;
+      saveSettings();
+      updatePace();
+    });
+  });
+
+  document.getElementById('openSide').addEventListener('click', openSidebar);
+  document.getElementById('closeSide').addEventListener('click', closeSidebar);
+  document.getElementById('overlay').addEventListener('click', closeSidebar);
+}
+init();
+</script>
+</body>
+</html>
